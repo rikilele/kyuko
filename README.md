@@ -5,7 +5,9 @@ Kyuko is an ultra-thin framework for [Deno Deploy](https://deno.com/deploy) scri
 It aims to provide a similar experience to developing a server with
 [Express](https://expressjs.com/).
 
-# Usage
+# Hello World
+
+Deployed at https://bad-ferret-36.deno.dev/
 
 ```ts
 const app = new Kyuko();
