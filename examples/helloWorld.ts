@@ -1,15 +1,5 @@
-> Fast, unopinionated, minimalist web framework for Deno Deploy 🦕
+import { Kyuko } from '../mod.ts';
 
-Kyuko is an ultra-light framework for [Deno Deploy](https://deno.com/deploy) scripts.
-
-It aims to provide a similar experience to developing a server with
-[express](https://expressjs.com/).
-
-Kyuko (急行) is a word for *express* trains in Japanese railway systems 🚃
-
-# Usage
-
-```ts
 const app = new Kyuko();
 
 app.get('/', () => {
@@ -28,4 +18,3 @@ app.post('/', (req) => {
 });
 
 app.listen();
-```
