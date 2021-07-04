@@ -51,9 +51,7 @@ export class Kyuko {
   }
 
   /**
-   *
-   * @param routePath
-   * @param customHandler
+   * Registers a customHandler that is invoked when GET requests are made to routePath.
    */
   get(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -61,9 +59,7 @@ export class Kyuko {
   }
 
   /**
-   *
-   * @param routePath
-   * @param customHandler
+   * Registers a customHandler that is invoked when POST requests are made to routePath.
    */
   post(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -71,9 +67,7 @@ export class Kyuko {
   }
 
   /**
-   *
-   * @param routePath
-   * @param customHandler
+   * Registers a customHandler that is invoked when PUT requests are made to routePath.
    */
   put(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -81,9 +75,7 @@ export class Kyuko {
   }
 
   /**
-   *
-   * @param routePath
-   * @param customHandler
+   * Registers a customHandler that is invoked when DELETE requests are made to routePath.
    */
   delete(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -91,9 +83,7 @@ export class Kyuko {
   }
 
   /**
-   *
-   * @param routePath
-   * @param customHandler
+   * Registers a customHandler that is invoked when any type of requests are made to routePath.
    */
   all(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -103,6 +93,9 @@ export class Kyuko {
     this.#customHandlers.get('DELETE')?.set(routePath, customHandler);
   }
 
+  /**
+   * Registers a default handler for requests that aren't caught by any other handlers.
+   */
   default(customDefaultHandler: KyukoRequestHandler) {
     this.#defaultHandler = customDefaultHandler;
   }
@@ -148,7 +141,6 @@ export class Kyuko {
       req.requestBody = json;
     }
 
-    // Call the callback!
     return handler(req);
   }
 

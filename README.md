@@ -1,11 +1,9 @@
 > Fast, unopinionated, minimalist web framework for Deno Deploy 🦕
 
-Kyuko is an ultra-light framework for [Deno Deploy](https://deno.com/deploy) scripts.
+Kyuko is an ultra-thin framework for [Deno Deploy](https://deno.com/deploy) scripts.
 
 It aims to provide a similar experience to developing a server with
-[express](https://expressjs.com/).
-
-Kyuko (急行) is a word for *express* trains in Japanese railway systems 🚃
+[Express](https://expressjs.com/).
 
 # Usage
 
