@@ -7,7 +7,7 @@ It aims to provide a similar experience to developing a server with
 
 # Hello World
 
-Deployed at https://bad-ferret-36.deno.dev/
+Deployed at https://kyuko.deno.dev/
 
 ```ts
 const app = new Kyuko();
