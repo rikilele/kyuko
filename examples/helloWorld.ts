@@ -13,8 +13,7 @@ app.get('/:name', (req) => {
 // json request bodies are loaded into req.requestBody by default
 app.post('/', (req) => {
   const { name } = req.requestBody;
-  const greetings = `Hello ${name}!`;
-  return new Response(greetings);
+  return new Response(`Hello ${name}!`);
 });
 
 app.listen();

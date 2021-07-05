@@ -1,15 +1,16 @@
 > Fast, unopinionated, minimalist web framework for Deno Deploy 🦕
 
-Kyuko is an ultra-thin framework for [Deno Deploy](https://deno.com/deploy) scripts.
+Kyuko is an ultra-light framework for API servers hosted on [Deno Deploy](https://deno.com/deploy).
 
-It aims to provide a similar experience to developing a server with
-[Express](https://expressjs.com/).
+It aims to provide a similar experience to developing API servers with [Express](https://expressjs.com/).
 
 # Hello World
 
-Deployed at https://kyuko.deno.dev/
+Deployed at https://kyuko.deno.dev
 
 ```ts
+import { Kyuko } from 'https://raw.githubusercontent.com/rikilele/kyuko/main/kyuko.ts';
+
 const app = new Kyuko();
 
 app.get('/', () => {
@@ -23,8 +24,7 @@ app.get('/:name', (req) => {
 // json request bodies are loaded into req.requestBody by default
 app.post('/', (req) => {
   const { name } = req.requestBody;
-  const greetings = `Hello ${name}!`;
-  return new Response(greetings);
+  return new Response(`Hello ${name}!`);
 });
 
 app.listen();
