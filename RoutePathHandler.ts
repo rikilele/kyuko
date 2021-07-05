@@ -1,4 +1,5 @@
 // Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
+
 /**
  * A handler that stores different route paths registered by Kyuko,
  * and offers methods to match url paths to those route paths.

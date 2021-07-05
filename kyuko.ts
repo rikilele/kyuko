@@ -1,4 +1,5 @@
 // Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
+
 /// <reference path='./deploy.d.ts' />
 
 import RoutePathHandler from './RoutePathHandler.ts';
