@@ -21,17 +21,19 @@ export default class RoutePathHandler {
     // Add the nodes of the route path to the tree
     let currNode = this.#rootNode;
     strings.forEach((str) => {
-      const isWildcard = str.startsWith(':');
-      if (isWildcard) {
+      const newNode = new RoutePathNode(str, currNode);
+
+      // If wildcard
+      if (str.startsWith(':')) {
         if (!currNode.wildcardChildren.has(str)) {
-          const newNode = new RoutePathNode(str, currNode, isWildcard);
           currNode.wildcardChildren.set(str, newNode);
         }
 
         currNode = currNode.wildcardChildren.get(str) as RoutePathNode;
+
+      // Not wildcard
       } else {
         if (!currNode.concreteChildren.has(str)) {
-          const newNode = new RoutePathNode(str, currNode, isWildcard);
           currNode.concreteChildren.set(str, newNode);
         }
 
@@ -96,9 +98,6 @@ class RoutePathNode {
   // The string value of the node
   value: string;
 
-  // If the node is a wildcard or not (ie, whether value starts with a ":" or not)
-  isWildcard: boolean;
-
   // The parent of the node
   parent: RoutePathNode | null;
 
@@ -111,14 +110,9 @@ class RoutePathNode {
   // Direct children of the node, where their values are wildcard values
   wildcardChildren: Map<string, RoutePathNode>;
 
-  constructor(
-    value: string,
-    parent: RoutePathNode | null,
-    isWildcard: boolean = false
-  ) {
+  constructor(value: string, parent: RoutePathNode | null) {
     this.value = value;
     this.parent = parent;
-    this.isWildcard = isWildcard;
     this.isStationaryNode = false;
     this.concreteChildren = new Map();
     this.wildcardChildren = new Map();
