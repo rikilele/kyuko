@@ -151,10 +151,7 @@ export class Kyuko {
     const urlArr = urlPath.split('/');
     routeArr.forEach((routeNode, i) => {
       const urlNode = urlArr[i];
-      if (
-        routeNode.startsWith(':')
-        && routeNode !== urlNode
-      ) {
+      if (routeNode.startsWith(':')) {
         result[routeNode.substring(1)] = urlNode;
       }
     });
