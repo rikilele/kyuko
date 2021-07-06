@@ -4,18 +4,12 @@ import { Kyuko } from '../mod.ts';
 
 const app = new Kyuko();
 
-app.get('/', () => {
-  return new Response('Hello World!');
+app.get('/', (_, res) => {
+  res.send('Hello World!');
 });
 
-app.get('/:name', (req) => {
-  return new Response(`Hello ${req.params.name}!`);
-});
-
-// json request bodies are loaded into req.requestBody by default
-app.post('/', (req) => {
-  const { name } = req.requestBody;
-  return new Response(`Hello ${name}!`);
+app.get('/:name', (req, res) => {
+  res.send(`Hello ${req.params.name}!`);
 });
 
 app.listen();

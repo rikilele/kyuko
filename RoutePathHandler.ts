@@ -11,7 +11,7 @@
  *
  * For more details, see: https://datatracker.ietf.org/doc/html/rfc3986.
  */
-export default class RoutePathHandler {
+export class RoutePathHandler {
   #treeHeight = 0;
   #rootNode = RoutePathNode.createRoot();
 

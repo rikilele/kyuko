@@ -1,5 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.100.0/testing/asserts.ts';
-import RoutePathHandler from './RoutePathHandler.ts';
+import { RoutePathHandler } from './RoutePathHandler.ts';
 
 Deno.test('empty handler', () => {
   const pathHandler = new RoutePathHandler();

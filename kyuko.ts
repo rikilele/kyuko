@@ -2,57 +2,72 @@
 
 /// <reference path='./deploy.d.ts' />
 
-import RoutePathHandler from './RoutePathHandler.ts';
+import { KyukoResponse } from './KyukoResponse.ts';
+import { RoutePathHandler } from './RoutePathHandler.ts';
 
+/**
+ * A handler that responds to a `req (KyukoRequest)` by modifying the `res (KyukoResponse)`,
+ * and finally calling `res.send()`.
+ */
 export type KyukoRequestHandler = (
-  ((req: KyukoRequest) => Response)
-  | ((req: KyukoRequest) => Promise<Response>)
+  ((req: KyukoRequest, res: KyukoResponse) => void)
+  | ((req: KyukoRequest, res: KyukoResponse) => Promise<void>)
 );
 
-export type KyukoRequest = Request & {
+// export type KyukoNextFn = VoidFunction;
+
+// export type KyukoMiddleware = (
+//   ((req: KyukoRequest, res: KyukoResponse, next: KyukoNextFn) => void)
+//   | ((req: KyukoRequest, res: KyukoResponse, next: KyukoNextFn) => Promise<void>)
+// );
+
+/**
+ * Request that gets passed into a `KyukoRequestHandler`.
+ * Can be extended further for middlewares to populate the original `Request`.
+ */
+export interface KyukoRequest extends Request {
+  /**
+   * Stores path parameters in an object.
+   */
   params: {
     [key: string]: string;
   };
 
+  /**
+   * Stores query parameters in an object.
+   */
   query: {
     [key: string]: string;
   };
+}
 
-  requestBody: {
-    [key: string]: string;
-  }
-};
-
+/**
+ *
+ */
 export class Kyuko {
-  #routes = new RoutePathHandler();
-  #customHandlers = new Map<string, Map<string, KyukoRequestHandler>>();
-  #defaultHandler: KyukoRequestHandler = () => {
-    return new Response('Not Found', { status: 404 })
-  };
-
-  constructor() {
-    this.#customHandlers.set('GET', new Map<string, KyukoRequestHandler>());
-    this.#customHandlers.set('POST', new Map<string, KyukoRequestHandler>());
-    this.#customHandlers.set('PUT', new Map<string, KyukoRequestHandler>());
-    this.#customHandlers.set('DELETE', new Map<string, KyukoRequestHandler>());
-  }
+  #routes;
+  // #middlewares: KyukoMiddleware[];
+  #defaultHandler: KyukoRequestHandler;
+  #customHandlers: Map<string, Map<string, KyukoRequestHandler>>;
 
   /**
-   * Starts listening to 'fetch' requests.
-   *
-   * @param cb Called when server starts listening to 'fetch' requests.
+   * Initializes a new kyuko app.
+   * Supports GET, POST, PUT, DELETE routing as of now.
    */
-  listen(cb = () => {}) {
-    addEventListener('fetch', (event) => {
-      const response = this.#handleRequest(event.request);
-      event.respondWith(response);
-    });
-
-    cb();
+  constructor() {
+    this.#routes = new RoutePathHandler();
+    // this.#middlewares = [];
+    this.#defaultHandler = () => new Response(null, { status: 404 });
+    this.#customHandlers = new Map();
+    this.#customHandlers.set('GET', new Map());
+    this.#customHandlers.set('POST', new Map());
+    this.#customHandlers.set('PUT', new Map());
+    this.#customHandlers.set('DELETE', new Map());
   }
 
   /**
-   * Registers a customHandler that is invoked when GET requests are made to routePath.
+   * Registers a `customHandler` that is invoked when
+   * GET requests are made to url paths that match the `routePath`.
    */
   get(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -60,7 +75,8 @@ export class Kyuko {
   }
 
   /**
-   * Registers a customHandler that is invoked when POST requests are made to routePath.
+   * Registers a `customHandler` that is invoked when
+   * POST requests are made to url paths that match the `routePath`.
    */
   post(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -68,7 +84,8 @@ export class Kyuko {
   }
 
   /**
-   * Registers a customHandler that is invoked when PUT requests are made to routePath.
+   * Registers a `customHandler` that is invoked when
+   * PUT requests are made to url paths that match the `routePath`.
    */
   put(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -76,7 +93,8 @@ export class Kyuko {
   }
 
   /**
-   * Registers a customHandler that is invoked when DELETE requests are made to routePath.
+   * Registers a `customHandler` that is invoked when
+   * DELETE requests are made to url paths that match the `routePath`.
    */
   delete(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -84,7 +102,8 @@ export class Kyuko {
   }
 
   /**
-   * Registers a customHandler that is invoked when any type of requests are made to routePath.
+   * Registers a `customHandler` that is invoked when
+   * any type of requests are made to url paths that match the `routePath`.
    */
   all(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -95,57 +114,68 @@ export class Kyuko {
   }
 
   /**
-   * Registers a default handler for requests that aren't caught by any other handlers.
+   * Registers a default handler that is invoked when
+   * a request isn't caught by any other custom handlers.
    */
-  default(customDefaultHandler: KyukoRequestHandler) {
-    this.#defaultHandler = customDefaultHandler;
+  default(defaultHandler: KyukoRequestHandler) {
+    this.#defaultHandler = defaultHandler;
   }
 
   /**
-   * Top-level wrapper that handles the request sent from the 'fetch' event.
-   *
-   * @param request The request sent from the 'fetch' event.
-   * @returns A Response object, or a Promise that returns a Response object.
+   * Starts listening to 'fetch' requests.
+   * @param callback Called when server starts listening.
    */
-  async #handleRequest(request: Request) {
-    const { pathname, searchParams } = new URL(request.url);
+  listen(callback: VoidFunction) {
+    addEventListener('fetch', this.handleFetchEvent.bind(this));
+    callback && callback();
+  }
 
-    // Find the route path that corresponds to the requested url path
-    const routePath = this.#routes.findMatch(pathname);
-
-    let handler: KyukoRequestHandler = this.#defaultHandler;
-    const req = request.clone() as KyukoRequest;
+  /**
+   *
+   * @param event
+   */
+  private handleFetchEvent(event: FetchEvent) {
+    const req = event.request as KyukoRequest;
     req.params = {};
     req.query = {};
-    req.requestBody = {};
+    const res = new KyukoResponse(event);
+    this.handleRequest(req, res);
+  }
 
+  private handleRequest(req: KyukoRequest, res: KyukoResponse) {
+    const { pathname, searchParams } = new URL(req.url);
+    const routePath = this.#routes.findMatch(pathname);
+    let handler: KyukoRequestHandler = this.#defaultHandler;
     if (routePath !== undefined) {
-      // Get handler
-      const customHandler = this.#customHandlers.get(request.method)?.get(routePath);
+      const customHandler = this.#customHandlers.get(req.method)?.get(routePath);
       if (customHandler) {
         handler = customHandler;
       }
 
-      // Put path parameters into req.params
-      req.params = this.#createReqParams(routePath, pathname);
+      req.params = this.createParamsObject(routePath, pathname);
     }
 
-    // Put query parameters into req.query
     for (const [key, value] of searchParams) {
       req.query[key] = value;
     }
 
-    // Translate request body into req.requestBody
-    const contentType = req.headers.get('content-type');
-    if (contentType?.includes('application/json')) {
-      const json = await req.json();
-      req.requestBody = json;
+    try {
+      handler(req, res);
+    } catch (e) {
+      console.error(e);
+      return new Response(null, { status: 500 });
     }
-
-    return handler(req);
   }
 
-  #createReqParams(routePath: string, urlPath: string) {
+  // private callMiddlewares(req: KyukoRequest, res: Response, index = 0) {
+  //   if (index < this.#middlewares.length) {
+  //     return this.#middlewares[index](req, res, () => {
+  //       this.callMiddlewares(req, res, index + 1);
+  //     });
+  //   }
+  // }
+
+  private createParamsObject(routePath: string, urlPath: string) {
     const result: KyukoRequest['params'] = {};
     const routeArr = routePath.split('/');
     const urlArr = urlPath.split('/');
