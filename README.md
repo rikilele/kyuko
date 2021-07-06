@@ -4,12 +4,14 @@ Kyuko is an ultra-light framework for API servers hosted on [Deno Deploy](https:
 
 It aims to provide a similar experience to developing API servers with [Express](https://expressjs.com/).
 
+Latest deno doc available [here](https://doc.deno.land/https/deno.land/x/kyuko/mod.ts)
+
 # Hello World
 
 Deployed at https://kyuko.deno.dev
 
 ```ts
-import { Kyuko } from 'https://raw.githubusercontent.com/rikilele/kyuko/main/mod.ts';
+import { Kyuko } from 'https://deno.land/x/kyuko@v0.1.0';
 
 const app = new Kyuko();
 
