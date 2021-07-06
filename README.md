@@ -9,7 +9,7 @@ It aims to provide a similar experience to developing API servers with [Express]
 Deployed at https://kyuko.deno.dev
 
 ```ts
-import { Kyuko } from 'https://raw.githubusercontent.com/rikilele/kyuko/main/kyuko.ts';
+import { Kyuko } from 'https://raw.githubusercontent.com/rikilele/kyuko/main/mod.ts';
 
 const app = new Kyuko();
 
