@@ -24,3 +24,11 @@ app.get('/:name', (req, res) => {
 app.listen();
 
 ```
+
+# Usage
+
+To run your Kyuko app locally using `deployctl`
+
+```sh
+deployctl run --libs="" your_kyuko_app.ts
+```
