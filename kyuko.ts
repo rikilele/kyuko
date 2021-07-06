@@ -57,7 +57,7 @@ export class Kyuko {
   constructor() {
     this.#routes = new RoutePathHandler();
     // this.#middlewares = [];
-    this.#defaultHandler = () => new Response(null, { status: 404 });
+    this.#defaultHandler = (_, res) => res.status(404).send();
     this.#customHandlers = new Map();
     this.#customHandlers.set('GET', new Map());
     this.#customHandlers.set('POST', new Map());
@@ -163,7 +163,7 @@ export class Kyuko {
       handler(req, res);
     } catch (e) {
       console.error(e);
-      return new Response(null, { status: 500 });
+      res.status(500).send();
     }
   }
 

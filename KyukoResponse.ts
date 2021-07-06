@@ -7,7 +7,7 @@
  */
 export class KyukoResponse {
   body: BodyInit | null;
-  status: number | undefined;
+  statusCode: number | undefined;
   statusText: string | undefined;
   headers: Headers;
   #fetchEvent: FetchEvent;
@@ -18,10 +18,18 @@ export class KyukoResponse {
    */
   constructor(fetchEvent: FetchEvent) {
     this.body = null;
-    this.status = undefined;
+    this.statusCode = undefined;
     this.statusText = undefined;
     this.headers = new Headers();
     this.#fetchEvent = fetchEvent;
+  }
+
+  /**
+   * Sets the status code to `status`, and returns `this`.
+   */
+  status(status: number) {
+    this.statusCode = status;
+    return this;
   }
 
   /**
@@ -35,7 +43,7 @@ export class KyukoResponse {
     const response = new Response(
       body || this.body,
       {
-        status: this.status,
+        status: this.statusCode,
         statusText: this.statusText,
         headers: this.headers,
       }
