@@ -125,7 +125,7 @@ export class Kyuko {
    * Starts listening to 'fetch' requests.
    * @param callback Called when server starts listening.
    */
-  listen(callback: VoidFunction) {
+  listen(callback?: VoidFunction) {
     addEventListener('fetch', this.handleFetchEvent.bind(this));
     callback && callback();
   }
