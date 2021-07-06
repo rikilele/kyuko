@@ -42,7 +42,8 @@ export interface KyukoRequest extends Request {
 }
 
 /**
- *
+ * An ultra-light framework for API servers hosted on [Deno Deploy](https://deno.com/deploy).
+ * Aims to provide a similar experience to developing API servers with [Express](https://expressjs.com/).
  */
 export class Kyuko {
   #routes;
@@ -51,8 +52,8 @@ export class Kyuko {
   #customHandlers: Map<string, Map<string, KyukoRequestHandler>>;
 
   /**
-   * Initializes a new kyuko app.
-   * Supports GET, POST, PUT, DELETE routing as of now.
+   * Initializes a new Kyuko app.
+   * Supports routing for GET, POST, PUT, DELETE methods as of now.
    */
   constructor() {
     this.#routes = new RoutePathHandler();
@@ -68,6 +69,15 @@ export class Kyuko {
   /**
    * Registers a `customHandler` that is invoked when
    * GET requests are made to url paths that match the `routePath`.
+   *
+   * example:
+   *
+   * ```ts
+   * app.get('/', (req, res) => {
+   *   const { name } = req.query;
+   *   res.send(`Hello ${name}!`);
+   * });
+   * ```
    */
   get(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -86,6 +96,18 @@ export class Kyuko {
   /**
    * Registers a `customHandler` that is invoked when
    * PUT requests are made to url paths that match the `routePath`.
+   *
+   * example:
+   *
+   * ```ts
+   * app.put('/users/:id', (req, res) => {
+   *   const { id } = req.params;
+   *
+   *   // ...
+   *
+   *   res.status(204).send(`Updated ${id}!`);
+   * });
+   * ```
    */
   put(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
@@ -130,10 +152,6 @@ export class Kyuko {
     callback && callback();
   }
 
-  /**
-   *
-   * @param event
-   */
   private handleFetchEvent(event: FetchEvent) {
     const req = event.request as KyukoRequest;
     req.params = {};
