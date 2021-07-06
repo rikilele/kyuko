@@ -10,6 +10,7 @@ export class KyukoResponse {
   statusCode: number | undefined;
   statusText: string | undefined;
   headers: Headers;
+  #sent: boolean;
   #fetchEvent: FetchEvent;
 
   /**
@@ -21,6 +22,7 @@ export class KyukoResponse {
     this.statusCode = undefined;
     this.statusText = undefined;
     this.headers = new Headers();
+    this.#sent = false;
     this.#fetchEvent = fetchEvent;
   }
 
@@ -40,15 +42,25 @@ export class KyukoResponse {
    * @param body A response body that would supersede `this.body`
    */
   send(body?: BodyInit) {
-    const response = new Response(
-      body || this.body,
-      {
-        status: this.statusCode,
-        statusText: this.statusText,
-        headers: this.headers,
-      }
-    );
+    if (!this.#sent) {
+      const response = new Response(
+        body || this.body,
+        {
+          status: this.statusCode,
+          statusText: this.statusText,
+          headers: this.headers,
+        }
+      );
 
-    this.#fetchEvent.respondWith(response);
+      this.#fetchEvent.respondWith(response);
+      this.#sent = true;
+    }
+  }
+
+  /**
+   * @returns Whether the response was sent (`send()` was called) or not.
+   */
+  wasSent() {
+    return this.#sent;
   }
 }

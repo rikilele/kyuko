@@ -14,12 +14,17 @@ export type KyukoRequestHandler = (
   | ((req: KyukoRequest, res: KyukoResponse) => Promise<void>)
 );
 
-// export type KyukoNextFn = VoidFunction;
-
-// export type KyukoMiddleware = (
-//   ((req: KyukoRequest, res: KyukoResponse, next: KyukoNextFn) => void)
-//   | ((req: KyukoRequest, res: KyukoResponse, next: KyukoNextFn) => Promise<void>)
-// );
+/**
+ * A function that has access to the `req` and `res` objects,
+ * and return early by calling `res.send()` when needed.
+ * Hands over execution to the next middleware / request handler on return.
+ *
+ * Notice how a `next()` call is unneeded.
+ */
+export type KyukoMiddleware = (
+  ((req: KyukoRequest, res: KyukoResponse) => void)
+  | ((req: KyukoRequest, res: KyukoResponse) => Promise<void>)
+);
 
 /**
  * Request that gets passed into a `KyukoRequestHandler`.
@@ -47,7 +52,7 @@ export interface KyukoRequest extends Request {
  */
 export class Kyuko {
   #routes;
-  // #middlewares: KyukoMiddleware[];
+  #middlewares: KyukoMiddleware[];
   #defaultHandler: KyukoRequestHandler;
   #customHandlers: Map<string, Map<string, KyukoRequestHandler>>;
 
@@ -57,7 +62,7 @@ export class Kyuko {
    */
   constructor() {
     this.#routes = new RoutePathHandler();
-    // this.#middlewares = [];
+    this.#middlewares = [];
     this.#defaultHandler = (_, res) => res.status(404).send();
     this.#customHandlers = new Map();
     this.#customHandlers.set('GET', new Map());
@@ -152,6 +157,14 @@ export class Kyuko {
     callback && callback();
   }
 
+  /**
+   * Adds `middleware` to the list of application-level middlewares to run.
+   * @param middleware
+   */
+  use(middleware: KyukoMiddleware) {
+    this.#middlewares.push(middleware);
+  }
+
   private handleFetchEvent(event: FetchEvent) {
     const req = event.request as KyukoRequest;
     req.params = {};
@@ -160,7 +173,7 @@ export class Kyuko {
     this.handleRequest(req, res);
   }
 
-  private handleRequest(req: KyukoRequest, res: KyukoResponse) {
+  private async handleRequest(req: KyukoRequest, res: KyukoResponse) {
     const { pathname, searchParams } = new URL(req.url);
     const routePath = this.#routes.findMatch(pathname);
     let handler: KyukoRequestHandler = this.#defaultHandler;
@@ -178,18 +191,27 @@ export class Kyuko {
     }
 
     try {
-      handler(req, res);
+      const needsFinalHandling = await this.runMiddlewares(req, res);
+      if (needsFinalHandling) {
+        handler(req, res);
+      }
     } catch (e) {
       console.error(e);
       res.status(500).send();
     }
   }
 
-  // private callMiddlewares(req: KyukoRequest, res: Response, index = 0) {
-  //   if (index < this.#middlewares.length) {
-  //     return this.#middlewares[index](req, res, () => {
-  //       this.callMiddlewares(req, res, index + 1);
-  //     });
-  //   }
-  // }
+  /**
+   * @returns `true` if middlewares ran until completion. `false` if responded early.
+   */
+  private async runMiddlewares(req: KyukoRequest, res: KyukoResponse) {
+    for (const middleware of this.#middlewares) {
+      await middleware(req, res);
+      if (res.wasSent()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
