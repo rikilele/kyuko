@@ -16,13 +16,35 @@ export class RoutePathHandler {
   #rootNode = RoutePathNode.createRoot();
 
   /**
+   * Given that the `urlPath` matches the `routePath`,
+   * compares the two strings and constructs an object that contains
+   * the wildcards as its keys and the corresponding url path segments as its values.
+   *
+   * @param routePath e.g.) "/users/:userId/friends/:friendId"
+   * @param urlPath e.g.) "/users/Alice/friends/Bob"
+   * @returns An object that can be used directly as `req.params`
+   */
+  static createPathParams(routePath: string, urlPath: string) {
+    const result: { [key: string]: string } = {};
+    const routeSegments = this.splitPathSegments(routePath);
+    const urlSegments = this.splitPathSegments(urlPath);
+    routeSegments.forEach((routeSegment, i) => {
+      if (routeSegment.startsWith(':')) {
+        result[routeSegment.substring(1)] = urlSegments[i];
+      }
+    });
+
+    return result;
+  }
+
+  /**
    * Adds a route path to the handler.
    * Added route paths will be considered in subsequent calls to `findMatch()`.
    *
    * @param path A valid Kyuko route path such as "/", "/users", "/users/:id"
    */
   addRoutePath(routePath: string): void {
-    const segments = this.splitPathSegments(routePath);
+    const segments = RoutePathHandler.splitPathSegments(routePath);
     this.#treeHeight = Math.max(segments.length, this.#treeHeight);
     let currNode = this.#rootNode;
     segments.forEach((segment) => {
@@ -41,7 +63,7 @@ export class RoutePathHandler {
    * @returns matched path if exists. undefined if not.
    */
   findMatch(urlPath: string): string | undefined {
-    const segments = this.splitPathSegments(urlPath);
+    const segments = RoutePathHandler.splitPathSegments(urlPath);
     if (this.#treeHeight < segments.length) {
       return undefined;
     }
@@ -83,7 +105,7 @@ export class RoutePathHandler {
    *
    * @param path The route or url path to split
    */
-  private splitPathSegments(path: string): string[] {
+  private static splitPathSegments(path: string): string[] {
     const result = path.split('/');
     const divider = result.findIndex(seg => seg !== '');
     if (divider === -1) {

@@ -152,7 +152,7 @@ export class Kyuko {
         handler = customHandler;
       }
 
-      req.params = this.createParamsObject(routePath, pathname);
+      req.params = RoutePathHandler.createPathParams(routePath, pathname);
     }
 
     for (const [key, value] of searchParams) {
@@ -174,18 +174,4 @@ export class Kyuko {
   //     });
   //   }
   // }
-
-  private createParamsObject(routePath: string, urlPath: string) {
-    const result: KyukoRequest['params'] = {};
-    const routeArr = routePath.split('/');
-    const urlArr = urlPath.split('/');
-    routeArr.forEach((routeNode, i) => {
-      const urlNode = urlArr[i];
-      if (routeNode.startsWith(':')) {
-        result[routeNode.substring(1)] = urlNode;
-      }
-    });
-
-    return result;
-  }
 }
