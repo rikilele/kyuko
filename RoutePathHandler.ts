@@ -29,7 +29,7 @@ export class RoutePathHandler {
     const routeSegments = this.splitPathSegments(routePath);
     const urlSegments = this.splitPathSegments(urlPath);
     routeSegments.forEach((routeSegment, i) => {
-      if (routeSegment.startsWith(':')) {
+      if (routeSegment.startsWith(":")) {
         result[routeSegment.substring(1)] = urlSegments[i];
       }
     });
@@ -73,7 +73,6 @@ export class RoutePathHandler {
       const nextNodes: RoutePathNode[] = [];
       currNodes.forEach((node) => {
         node.findMatchingChildren(segment).forEach((child) => {
-
           // Child should be taller than remaining path
           if (child.getHeight() >= segments.length - i - 1) {
             nextNodes.push(child);
@@ -84,7 +83,7 @@ export class RoutePathHandler {
       currNodes = nextNodes;
     });
 
-    const finalists = currNodes.filter(node => node.isStationaryNode);
+    const finalists = currNodes.filter((node) => node.isStationaryNode);
     if (finalists.length === 0) {
       return undefined;
     }
@@ -108,14 +107,14 @@ export class RoutePathHandler {
    * @param path The route or url path to split
    */
   private static splitPathSegments(path: string): string[] {
-    const result = path.split('/');
-    const divider = result.findIndex(seg => seg !== '');
+    const result = path.split("/");
+    const divider = result.findIndex((seg) => seg !== "");
     if (divider === -1) {
-      return [''];
+      return [""];
     }
 
     result.splice(0, divider - 1);
-    if (result[result.length - 1] === '') {
+    if (result[result.length - 1] === "") {
       result.pop();
     }
 
@@ -129,7 +128,6 @@ export class RoutePathHandler {
  * Each segment of the route path will be stored in a tree data structure as nodes.
  */
 class RoutePathNode {
-
   /**
    * Whether the node can be considered the end of a path or not.
    */
@@ -145,7 +143,7 @@ class RoutePathNode {
    * @returns A new `RoutePathNode` that acts as the root of the tree.
    */
   static createRoot(): RoutePathNode {
-    return new RoutePathNode('\0', null);
+    return new RoutePathNode("\0", null);
   }
 
   /**
@@ -181,7 +179,7 @@ class RoutePathNode {
    */
   findOrCreateChild(value: string): RoutePathNode {
     let container = this.#concreteChildren;
-    if (value.startsWith(':')) {
+    if (value.startsWith(":")) {
       container = this.#wildcardChildren;
     }
 
@@ -257,6 +255,6 @@ class RoutePathNode {
     }
 
     result.reverse();
-    return result.join('/') || '/';
+    return result.join("/") || "/";
   }
 }

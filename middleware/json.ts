@@ -1,4 +1,4 @@
-import { KyukoRequest, KyukoResponse } from '../mod.ts'
+import { KyukoRequest, KyukoResponse } from "../mod.ts";
 
 export interface KyukoRequestWithJson extends KyukoRequest {
   // deno-lint-ignore no-explicit-any
@@ -6,9 +6,9 @@ export interface KyukoRequestWithJson extends KyukoRequest {
 }
 
 export async function json(req: KyukoRequest, res: KyukoResponse) {
-  const contentType = req.headers.get('content-type');
-  res.headers.append('Content-Type', 'application/json; charset=utf-8');
-  if (contentType?.includes('application/json')) {
+  const contentType = req.headers.get("content-type");
+  res.headers.append("Content-Type", "application/json; charset=utf-8");
+  if (contentType?.includes("application/json")) {
     const requestClone = req.clone();
     const json = await requestClone.json();
     (req as KyukoRequestWithJson).requestBody = json;

@@ -49,7 +49,7 @@ export class KyukoResponse {
           status: this.statusCode,
           statusText: this.statusText,
           headers: this.headers,
-        }
+        },
       );
 
       this.#fetchEvent.respondWith(response);

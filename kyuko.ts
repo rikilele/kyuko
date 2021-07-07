@@ -2,15 +2,15 @@
 
 /// <reference path='./deploy.d.ts' />
 
-import { KyukoResponse } from './KyukoResponse.ts';
-import { RoutePathHandler } from './RoutePathHandler.ts';
+import { KyukoResponse } from "./KyukoResponse.ts";
+import { RoutePathHandler } from "./RoutePathHandler.ts";
 
 /**
  * A handler that responds to a `req (KyukoRequest)` by modifying the `res (KyukoResponse)`,
  * and finally calling `res.send()`.
  */
 export type KyukoRequestHandler = (
-  ((req: KyukoRequest, res: KyukoResponse) => void)
+  | ((req: KyukoRequest, res: KyukoResponse) => void)
   | ((req: KyukoRequest, res: KyukoResponse) => Promise<void>)
 );
 
@@ -22,7 +22,7 @@ export type KyukoRequestHandler = (
  * Notice how a `next()` call is unneeded.
  */
 export type KyukoMiddleware = (
-  ((req: KyukoRequest, res: KyukoResponse) => void)
+  | ((req: KyukoRequest, res: KyukoResponse) => void)
   | ((req: KyukoRequest, res: KyukoResponse) => Promise<void>)
 );
 
@@ -64,10 +64,10 @@ export class Kyuko {
     this.#middlewares = [];
     this.#defaultHandler = (_, res) => res.status(404).send();
     this.#customHandlers = new Map();
-    this.#customHandlers.set('GET', new Map());
-    this.#customHandlers.set('POST', new Map());
-    this.#customHandlers.set('PUT', new Map());
-    this.#customHandlers.set('DELETE', new Map());
+    this.#customHandlers.set("GET", new Map());
+    this.#customHandlers.set("POST", new Map());
+    this.#customHandlers.set("PUT", new Map());
+    this.#customHandlers.set("DELETE", new Map());
   }
 
   /**
@@ -85,7 +85,7 @@ export class Kyuko {
    */
   get(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get('GET')?.set(routePath, customHandler);
+    this.#customHandlers.get("GET")?.set(routePath, customHandler);
   }
 
   /**
@@ -94,7 +94,7 @@ export class Kyuko {
    */
   post(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get('POST')?.set(routePath, customHandler);
+    this.#customHandlers.get("POST")?.set(routePath, customHandler);
   }
 
   /**
@@ -115,7 +115,7 @@ export class Kyuko {
    */
   put(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get('PUT')?.set(routePath, customHandler);
+    this.#customHandlers.get("PUT")?.set(routePath, customHandler);
   }
 
   /**
@@ -124,7 +124,7 @@ export class Kyuko {
    */
   delete(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get('DELETE')?.set(routePath, customHandler);
+    this.#customHandlers.get("DELETE")?.set(routePath, customHandler);
   }
 
   /**
@@ -133,10 +133,10 @@ export class Kyuko {
    */
   all(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get('GET')?.set(routePath, customHandler);
-    this.#customHandlers.get('POST')?.set(routePath, customHandler);
-    this.#customHandlers.get('PUT')?.set(routePath, customHandler);
-    this.#customHandlers.get('DELETE')?.set(routePath, customHandler);
+    this.#customHandlers.get("GET")?.set(routePath, customHandler);
+    this.#customHandlers.get("POST")?.set(routePath, customHandler);
+    this.#customHandlers.get("PUT")?.set(routePath, customHandler);
+    this.#customHandlers.get("DELETE")?.set(routePath, customHandler);
   }
 
   /**
@@ -152,7 +152,7 @@ export class Kyuko {
    * @param callback Called when server starts listening.
    */
   listen(callback?: VoidFunction) {
-    addEventListener('fetch', this.handleFetchEvent.bind(this));
+    addEventListener("fetch", this.handleFetchEvent.bind(this));
     callback && callback();
   }
 
@@ -179,9 +179,9 @@ export class Kyuko {
     // Handle routing
     const routePath = this.#routes.findMatch(pathname);
     if (routePath !== undefined) {
-      const customHandler = this.#customHandlers.get(req.method)?.get(routePath);
-      if (customHandler) {
-        handler = customHandler;
+      const customHandlers = this.#customHandlers.get(req.method);
+      if (customHandlers?.has(routePath)) {
+        handler = customHandlers.get(routePath) as KyukoRequestHandler;
       }
 
       // Fill req.params
