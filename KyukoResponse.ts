@@ -1,3 +1,5 @@
+/// <reference path='./deploy.d.ts' />
+
 /**
  * This class is instantiated when a fetch request is captured by a Kyuko application.
  * The instance is responsible for storing information about the response to the request.
