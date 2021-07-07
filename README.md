@@ -1,10 +1,11 @@
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/rikilele/kyuko)
+[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/kyuko/mod.ts)
+
 > Fast, unopinionated, minimalist web framework for Deno Deploy 🦕
 
 Kyuko is an ultra-light framework for API servers hosted on [Deno Deploy](https://deno.com/deploy).
 
-It aims to provide a similar experience to developing API servers with [Express](https://expressjs.com/).
-
-Latest deno doc available [here](https://doc.deno.land/https/deno.land/x/kyuko/mod.ts)
+It aims to provide a similar experience to developing API servers with [Express](https://expressjs.com/), [hence its name](https://translate.google.com/?sl=ja&tl=en&text=%E6%80%A5%E8%A1%8C&op=translate&hl=en).
 
 # Hello World
 
@@ -29,7 +30,7 @@ app.listen();
 
 # Usage
 
-To run your Kyuko app locally using `deployctl`
+To run your Kyuko app locally using `deployctl`:
 
 ```sh
 deployctl run --libs="" your_kyuko_app.ts
