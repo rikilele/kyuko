@@ -12,7 +12,6 @@
  * For more details, see: https://datatracker.ietf.org/doc/html/rfc3986.
  */
 export class RoutePathHandler {
-  #treeHeight = 0;
   #rootNode = RoutePathNode.createRoot();
 
   /**
@@ -46,7 +45,6 @@ export class RoutePathHandler {
    */
   addRoutePath(routePath: string): void {
     const segments = RoutePathHandler.splitPathSegments(routePath);
-    this.#treeHeight = Math.max(segments.length, this.#treeHeight);
     let currNode = this.#rootNode;
     segments.forEach((segment) => {
       currNode = currNode.findOrCreateChild(segment);
@@ -58,37 +56,40 @@ export class RoutePathHandler {
   /**
    * Returns a route path that matches the input urlPath.
    * Returns undefined if no such path exists.
-   * Prioritizes route paths that were added earlier.
+   * Prioritizes route paths that have early exact matches rather than wildcards,
+   * and route paths that were added earlier to the handler.
    *
    * @param urlPath The path to match.
    * @returns matched path if exists. undefined if not.
    */
   findMatch(urlPath: string): string | undefined {
     const segments = RoutePathHandler.splitPathSegments(urlPath);
-    if (this.#treeHeight < segments.length) {
-      return undefined;
-    }
-
-    let currNodes = [this.#rootNode];
-    for (const segment of segments) {
+    let currNodes: RoutePathNode[] = [this.#rootNode];
+    segments.forEach((segment, i) => {
       if (currNodes.length === 0) {
         return undefined;
       }
 
       const nextNodes: RoutePathNode[] = [];
       currNodes.forEach((node) => {
-        nextNodes.push(...node.findMatchingChildren(segment));
+        node.findMatchingChildren(segment).forEach((child) => {
+
+          // Child should be taller than remaining path
+          if (child.getHeight() >= segments.length - i - 1) {
+            nextNodes.push(child);
+          }
+        });
       });
 
       currNodes = nextNodes;
-    }
+    });
 
-    const matchedNodes = currNodes.filter(node => node.isStationaryNode);
-    if (matchedNodes.length === 0) {
+    const finalists = currNodes.filter(node => node.isStationaryNode);
+    if (finalists.length === 0) {
       return undefined;
     }
 
-    return matchedNodes[0].getFullPath();
+    return finalists[0].getFullPath();
   }
 
   /**
@@ -135,6 +136,7 @@ class RoutePathNode {
   isStationaryNode: boolean;
 
   #value: string;
+  #height: number;
   #parent: RoutePathNode | null;
   #concreteChildren: Map<string, RoutePathNode>;
   #wildcardChildren: Map<string, RoutePathNode>;
@@ -157,9 +159,17 @@ class RoutePathNode {
   private constructor(value: string, parent: RoutePathNode | null) {
     this.isStationaryNode = false;
     this.#value = value;
+    this.#height = 0;
     this.#parent = parent;
     this.#concreteChildren = new Map();
     this.#wildcardChildren = new Map();
+  }
+
+  /**
+   * @returns The height of the node (= # of nodes until furthest leaf)
+   */
+  getHeight(): number {
+    return this.#height;
   }
 
   /**
@@ -181,7 +191,27 @@ class RoutePathNode {
 
     const newNode = new RoutePathNode(value, this);
     container.set(value, newNode);
+    newNode.updateTreeHeight();
     return newNode;
+  }
+
+  /*
+   * To be called by `findOrCreateChild()`.
+   * Assumes that `this` refers to a newly created child node.
+   */
+  private updateTreeHeight() {
+    let currNode = this as RoutePathNode;
+    while (currNode.#parent !== null) {
+      const parentNode = currNode.#parent;
+
+      // Parent has taller children
+      if (parentNode.#height !== currNode.#height) {
+        return;
+      }
+
+      parentNode.#height += 1;
+      currNode = parentNode;
+    }
   }
 
   /**
