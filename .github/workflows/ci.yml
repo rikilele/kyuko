@@ -40,8 +40,9 @@ jobs:
       - name: Run linter
         run: deno lint
 
-      - name: Cache dependencies
-        run: deno cache deps.ts
+      # Uncomment this step when we start using dependencies
+      # - name: Cache dependencies
+      #   run: deno cache deps.ts
 
       - name: Run tests
         run: deno test -A --unstable
