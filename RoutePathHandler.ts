@@ -19,10 +19,11 @@ export class RoutePathHandler {
    * Given that the `urlPath` matches the `routePath`,
    * compares the two strings and constructs an object that contains
    * the wildcards as its keys and the corresponding url path segments as its values.
+   * The object an be used directly as `req.params`.
    *
    * @param routePath e.g.) "/users/:userId/friends/:friendId"
    * @param urlPath e.g.) "/users/Alice/friends/Bob"
-   * @returns An object that can be used directly as `req.params`
+   * @returns e.g.) { userId: "Alice", friendId: "Bob" }
    */
   static createPathParams(routePath: string, urlPath: string) {
     const result: { [key: string]: string } = {};

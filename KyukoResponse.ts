@@ -29,7 +29,7 @@ export class KyukoResponse {
   /**
    * Sets the status code to `status`, and returns `this`.
    */
-  status(status: number) {
+  status(status: number): this {
     this.statusCode = status;
     return this;
   }
@@ -41,7 +41,7 @@ export class KyukoResponse {
    *
    * @param body A response body that would supersede `this.body`
    */
-  send(body?: BodyInit) {
+  send(body?: BodyInit): void {
     if (!this.#sent) {
       const response = new Response(
         body || this.body,
@@ -60,7 +60,7 @@ export class KyukoResponse {
   /**
    * @returns Whether the response was sent (`send()` was called) or not.
    */
-  wasSent() {
+  wasSent(): boolean {
     return this.#sent;
   }
 }
