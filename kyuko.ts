@@ -32,18 +32,17 @@ export type KyukoMiddleware = (
  */
 export interface KyukoRequest extends Request {
   /**
-   * Stores path parameters in an object.
+   * Stores path parameters and their values in an object.
    */
   params: {
     [key: string]: string;
   };
 
   /**
-   * Stores query parameters in an object.
+   * Stores query parameters and their values.
+   * Note that duplicate keys may map to different values.
    */
-  query: {
-    [key: string]: string;
-  };
+  query: URLSearchParams;
 }
 
 /**
@@ -168,27 +167,31 @@ export class Kyuko {
   private handleFetchEvent(event: FetchEvent) {
     const req = event.request as KyukoRequest;
     req.params = {};
-    req.query = {};
+    req.query = new URLSearchParams();
     const res = new KyukoResponse(event);
     this.handleRequest(req, res);
   }
 
   private async handleRequest(req: KyukoRequest, res: KyukoResponse) {
     const { pathname, searchParams } = new URL(req.url);
-    const routePath = this.#routes.findMatch(pathname);
     let handler: KyukoRequestHandler = this.#defaultHandler;
+
+    // Handle routing
+    const routePath = this.#routes.findMatch(pathname);
     if (routePath !== undefined) {
       const customHandler = this.#customHandlers.get(req.method)?.get(routePath);
       if (customHandler) {
         handler = customHandler;
       }
 
+      // Fill req.params
       req.params = RoutePathHandler.createPathParams(routePath, pathname);
     }
 
-    for (const [key, value] of searchParams) {
-      req.query[key] = value;
-    }
+    // Fill req.query
+    searchParams.forEach((value, key) => {
+      req.query.append(key, value);
+    });
 
     try {
       const needsFinalHandling = await this.runMiddlewares(req, res);
