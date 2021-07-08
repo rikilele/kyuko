@@ -12,7 +12,7 @@ app.error((err, _req, res) => {
 });
 
 app.get("/", (_req, _res) => {
-  throw new Error('An intentional error occurred!');
+  throw new Error("An intentional error occurred!");
 });
 
 app.listen();
