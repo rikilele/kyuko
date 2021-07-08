@@ -7,8 +7,8 @@ import { KyukoResponse, KyukoResponseImpl } from "./KyukoResponse.ts";
 import { RoutePathHandler } from "./RoutePathHandler.ts";
 
 /**
- * A handler that responds to a `req (KyukoRequest)` by modifying the `res (KyukoResponse)`,
- * and finally calling `res.send()`.
+ * A function that is invoked in response to fetch requests.
+ * Runs after all middleware functions have been called.
  */
 export type KyukoRequestHandler = (
   | ((req: KyukoRequest, res: KyukoResponse) => void)
@@ -16,15 +16,22 @@ export type KyukoRequestHandler = (
 );
 
 /**
- * A function that has access to the `req` and `res` objects,
- * and return early by calling `res.send()` when needed.
+ * A function that is invoked before the request handler is called.
  * Hands over execution to the next middleware / request handler on return.
- *
- * Notice how a `next()` call is unneeded unlike middleware functions in Express.
  */
 export type KyukoMiddleware = (
   | ((req: KyukoRequest, res: KyukoResponse) => void)
   | ((req: KyukoRequest, res: KyukoResponse) => Promise<void>)
+);
+
+/**
+ * A function that is invoked when errors are thrown within the Kyuko app.
+ * Has access to the `err` object as well as the `req` and `res` objects.
+ * Hands over execution to the next error handler on return.
+ */
+export type KyukoErrorHandler = (
+  | ((err: Error, req: KyukoRequest, res: KyukoResponse) => void)
+  | ((err: Error, req: KyukoRequest, res: KyukoResponse) => Promise<void>)
 );
 
 /**
@@ -34,6 +41,7 @@ export type KyukoMiddleware = (
 export class Kyuko {
   #routes;
   #middlewares: KyukoMiddleware[];
+  #errorHandlers: KyukoErrorHandler[];
   #defaultHandler: KyukoRequestHandler;
   #customHandlers: Map<string, Map<string, KyukoRequestHandler>>;
 
@@ -50,6 +58,7 @@ export class Kyuko {
   constructor() {
     this.#routes = new RoutePathHandler();
     this.#middlewares = [];
+    this.#errorHandlers = [];
     this.#defaultHandler = (_, res) => res.status(404).send();
     this.#customHandlers = new Map();
     this.#customHandlers.set("GET", new Map());
@@ -61,7 +70,7 @@ export class Kyuko {
   }
 
   /**
-   * Registers a `customHandler` that is invoked when
+   * Registers a `handler` that is invoked when
    * GET requests are made to url paths that match the `routePath`.
    *
    * example:
@@ -73,22 +82,22 @@ export class Kyuko {
    * });
    * ```
    */
-  get(routePath: string, customHandler: KyukoRequestHandler) {
+  get(routePath: string, handler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get("GET")?.set(routePath, customHandler);
+    this.#customHandlers.get("GET")?.set(routePath, handler);
   }
 
   /**
-   * Registers a `customHandler` that is invoked when
+   * Registers a `handler` that is invoked when
    * POST requests are made to url paths that match the `routePath`.
    */
-  post(routePath: string, customHandler: KyukoRequestHandler) {
+  post(routePath: string, handler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get("POST")?.set(routePath, customHandler);
+    this.#customHandlers.get("POST")?.set(routePath, handler);
   }
 
   /**
-   * Registers a `customHandler` that is invoked when
+   * Registers a `handler` that is invoked when
    * PUT requests are made to url paths that match the `routePath`.
    *
    * example:
@@ -103,31 +112,31 @@ export class Kyuko {
    * });
    * ```
    */
-  put(routePath: string, customHandler: KyukoRequestHandler) {
+  put(routePath: string, handler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get("PUT")?.set(routePath, customHandler);
+    this.#customHandlers.get("PUT")?.set(routePath, handler);
   }
 
   /**
-   * Registers a `customHandler` that is invoked when
+   * Registers a `handler` that is invoked when
    * DELETE requests are made to url paths that match the `routePath`.
    */
-  delete(routePath: string, customHandler: KyukoRequestHandler) {
+  delete(routePath: string, handler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get("DELETE")?.set(routePath, customHandler);
+    this.#customHandlers.get("DELETE")?.set(routePath, handler);
   }
 
   /**
-   * Registers a `customHandler` that is invoked when
+   * Registers a `handler` that is invoked when
    * PATCH requests are made to url paths that match the `routePath`.
    */
-  patch(routePath: string, customHandler: KyukoRequestHandler) {
+  patch(routePath: string, handler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get("PATCH")?.set(routePath, customHandler);
+    this.#customHandlers.get("PATCH")?.set(routePath, handler);
   }
 
   /**
-   * Registers a `customHandler` that is invoked when
+   * Registers a `handler` that is invoked when
    * HEAD requests are made to url paths that match the `routePath`.
    *
    * example:
@@ -140,29 +149,29 @@ export class Kyuko {
    * });
    * ```
    */
-  head(routePath: string, customHandler: KyukoRequestHandler) {
+  head(routePath: string, handler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get("HEAD")?.set(routePath, customHandler);
+    this.#customHandlers.get("HEAD")?.set(routePath, handler);
   }
 
   /**
-   * Registers a `customHandler` that is invoked when
+   * Registers a `handler` that is invoked when
    * any type of requests are made to url paths that match the `routePath`.
    */
-  all(routePath: string, customHandler: KyukoRequestHandler) {
+  all(routePath: string, handler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
-    this.#customHandlers.get("GET")?.set(routePath, customHandler);
-    this.#customHandlers.get("POST")?.set(routePath, customHandler);
-    this.#customHandlers.get("PUT")?.set(routePath, customHandler);
-    this.#customHandlers.get("DELETE")?.set(routePath, customHandler);
+    this.#customHandlers.get("GET")?.set(routePath, handler);
+    this.#customHandlers.get("POST")?.set(routePath, handler);
+    this.#customHandlers.get("PUT")?.set(routePath, handler);
+    this.#customHandlers.get("DELETE")?.set(routePath, handler);
   }
 
   /**
-   * Registers a default handler that is invoked when
+   * Registers a default `handler` that is invoked when
    * a request isn't caught by any other custom handlers.
    */
-  default(defaultHandler: KyukoRequestHandler) {
-    this.#defaultHandler = defaultHandler;
+  default(handler: KyukoRequestHandler) {
+    this.#defaultHandler = handler;
   }
 
   /**
@@ -175,11 +184,21 @@ export class Kyuko {
   }
 
   /**
-   * Adds `middleware` to the list of application-level middlewares to run.
-   * @param middleware
+   * Adds `middleware` to a list of application-level middlewares to run.
+   * Middlewares are invoked in order of addition via `use()`.
    */
   use(middleware: KyukoMiddleware) {
     this.#middlewares.push(middleware);
+  }
+
+  /**
+   * Adds `errorHandler` to a list of application-level error handlers.
+   * Error handlers are invoked in order of addition via `error()`.
+   *
+   * > Note that in Express, you call `use()` instead.
+   */
+  error(errorHandler: KyukoErrorHandler) {
+    this.#errorHandlers.push(errorHandler);
   }
 
   private handleFetchEvent(event: FetchEvent) {
@@ -188,7 +207,7 @@ export class Kyuko {
     this.handleRequest(req, res);
   }
 
-  private async handleRequest(req: KyukoRequest, res: KyukoResponse) {
+  private handleRequest(req: KyukoRequest, res: KyukoResponse) {
     const { pathname, searchParams } = new URL(req.url);
     let handler: KyukoRequestHandler = this.#defaultHandler;
 
@@ -209,28 +228,42 @@ export class Kyuko {
       req.query.append(key, value);
     });
 
-    try {
-      const needsFinalHandling = await this.runMiddlewares(req, res);
-      if (needsFinalHandling) {
-        handler(req, res);
-      }
-    } catch (e) {
-      console.error(e);
-      res.status(500).send();
-    }
+    this.invokeHandlers(req, res, handler);
   }
 
-  /**
-   * @returns `true` if middlewares ran until completion. `false` if responded early.
-   */
-  private async runMiddlewares(req: KyukoRequest, res: KyukoResponse) {
-    for (const middleware of this.#middlewares) {
-      await middleware(req, res);
-      if (res.wasSent()) {
-        return false;
+  private async invokeHandlers(
+    req: KyukoRequest,
+    res: KyukoResponse,
+    handler: KyukoRequestHandler,
+  ) {
+    // Run middleware and request handler
+    try {
+      for (const middleware of this.#middlewares) {
+        await middleware(req, res);
+      }
+
+      handler(req, res);
+
+      // Catch error from middleware OR request handler
+    } catch (err1) {
+      console.error("A KyukoMiddleware or KyukoRequestHandler threw an error:");
+      console.error(err1);
+
+      // Run error handlers
+      try {
+        for (const errorHandler of this.#errorHandlers) {
+          await errorHandler(err1, req, res);
+        }
+
+        // Catch error from error handler
+      } catch (err2) {
+        console.error("A KyukoErrorHandler threw an error:");
+        console.error(err2);
+      }
+
+      if (!res.wasSent()) {
+        res.status(500).send();
       }
     }
-
-    return true;
   }
 }

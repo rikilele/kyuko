@@ -81,29 +81,39 @@ export class KyukoResponseImpl implements KyukoResponse {
   }
 
   redirect(address: string, status = 302) {
+    if (this.#sent) {
+      return KyukoResponseImpl.warnMultipleSends();
+    }
+
     this.status(status);
     this.headers.append("Location", encodeURI(address));
     this.send();
   }
 
   send(body?: BodyInit) {
-    if (!this.#sent) {
-      const response = new Response(
-        body || this.body,
-        {
-          status: this.statusCode,
-          statusText: this.statusText,
-          headers: this.headers,
-        },
-      );
-
-      this.#fetchEvent.respondWith(response);
-      this.#sent = true;
+    if (this.#sent) {
+      return KyukoResponseImpl.warnMultipleSends();
     }
+
+    const response = new Response(
+      body || this.body,
+      {
+        status: this.statusCode,
+        statusText: this.statusText,
+        headers: this.headers,
+      },
+    );
+
+    this.#fetchEvent.respondWith(response);
+    this.#sent = true;
   }
 
   wasSent() {
     return this.#sent;
+  }
+
+  private static warnMultipleSends() {
+    console.error("Error: Can't set headers after they are sent");
   }
 
   /*
