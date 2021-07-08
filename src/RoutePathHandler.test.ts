@@ -1,3 +1,5 @@
+// Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
+
 import { assertEquals } from "https://deno.land/std@0.100.0/testing/asserts.ts";
 import { RoutePathHandler } from "./RoutePathHandler.ts";
 
