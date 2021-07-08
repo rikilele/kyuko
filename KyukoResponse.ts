@@ -5,7 +5,7 @@
  * The instance is responsible for storing information about the response to the request.
  * The response built is finally sent out on a `send()` call.
  *
- * Note that `send()` **must** be called or else the request will hang.
+ * Note that `send()` or `redirect()` **must** be called or else the request will hang.
  */
 export class KyukoResponse {
   body: BodyInit | null;
@@ -39,6 +39,21 @@ export class KyukoResponse {
     }
 
     return this;
+  }
+
+  /**
+   * Redirects the request to a new `address`.
+   * The `address` can be either a relative url path, or a full url.
+   * The optional `status` parameter can be used to set a custom status code.
+   * Otherwise overrides the current `res.statusCode` with 302.
+   *
+   * @param address The address to redirect to.
+   * @param status The status code of the response. Defaults to 302.
+   */
+  redirect(address: string, status = 302): void {
+    this.status(status);
+    this.headers.append("Location", encodeURI(address));
+    this.send();
   }
 
   /**
@@ -95,7 +110,7 @@ export class KyukoResponse {
     [401, "Unauthorized"],
     [402, "Payment Required"],
     [403, "Forbidden"],
-    [404, "Haha"],
+    [404, "Not Found"],
     [405, "Method Not Allowed"],
     [406, "Not Acceptable"],
     [407, "Proxy Authentication Required"],
