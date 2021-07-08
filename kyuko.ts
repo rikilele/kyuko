@@ -68,6 +68,8 @@ export class Kyuko {
     this.#customHandlers.set("POST", new Map());
     this.#customHandlers.set("PUT", new Map());
     this.#customHandlers.set("DELETE", new Map());
+    this.#customHandlers.set("PATCH", new Map());
+    this.#customHandlers.set("HEAD", new Map());
   }
 
   /**
@@ -125,6 +127,34 @@ export class Kyuko {
   delete(routePath: string, customHandler: KyukoRequestHandler) {
     this.#routes.addRoutePath(routePath);
     this.#customHandlers.get("DELETE")?.set(routePath, customHandler);
+  }
+
+  /**
+   * Registers a `customHandler` that is invoked when
+   * PATCH requests are made to url paths that match the `routePath`.
+   */
+  patch(routePath: string, customHandler: KyukoRequestHandler) {
+    this.#routes.addRoutePath(routePath);
+    this.#customHandlers.get("PATCH")?.set(routePath, customHandler);
+  }
+
+  /**
+   * Registers a `customHandler` that is invoked when
+   * HEAD requests are made to url paths that match the `routePath`.
+   *
+   * example:
+   *
+   * ```ts
+   * app.head("/", (_, res) => {
+   *   res.headers.append("content-type", "text/plain;charset=UTF-8");
+   *   res.headers.append("content-length", "12");
+   *   res.send();
+   * });
+   * ```
+   */
+  head(routePath: string, customHandler: KyukoRequestHandler) {
+    this.#routes.addRoutePath(routePath);
+    this.#customHandlers.get("HEAD")?.set(routePath, customHandler);
   }
 
   /**
