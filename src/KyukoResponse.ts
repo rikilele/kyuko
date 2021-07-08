@@ -1,13 +1,55 @@
+// Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
+
 /// <reference path='./deploy.d.ts' />
 
 /**
- * This class is instantiated when a fetch request is captured by a Kyuko application.
- * The instance is responsible for storing information about the response to the request.
- * The response built is finally sent out on a `send()` call.
+ * The response object that is handled in Kyuko applications.
+ * Responsible for storing information about the response to the request,
+ * as well as sending the response via the `send()` and `redirect()` methods.
  *
  * Note that `send()` or `redirect()` **must** be called or else the request will hang.
  */
-export class KyukoResponse {
+export interface KyukoResponse {
+  body: BodyInit | null;
+  statusCode: number | undefined;
+  statusText: string | undefined;
+  headers: Headers;
+
+  /**
+   * Sets the status code to `status`, and returns `this`.
+   */
+  status(status: number): KyukoResponse;
+
+  /**
+   * Redirects the request to a new `address`.
+   * The `address` can be either a relative url path, or a full url.
+   * The optional `status` parameter can be used to set a custom status code.
+   * Otherwise overrides the current `res.statusCode` with 302.
+   *
+   * @param address The address to redirect to.
+   * @param status The status code of the response. Defaults to 302.
+   */
+  redirect(address: string, status?: number): void;
+
+  /**
+   * Sends a response to the original request that instantiated this object.
+   * The response is built using the public attributes of this object,
+   * which should've been set by the user beforehand.
+   *
+   * @param body A response body that would supersede `this.body`
+   */
+  send(body?: BodyInit): void;
+
+  /**
+   * @returns Whether the response was sent (`send()` was called) or not.
+   */
+  wasSent(): boolean;
+}
+
+/**
+ * This class is instantiated when a fetch request is captured by a Kyuko application.
+ */
+export class KyukoResponseImpl implements KyukoResponse {
   body: BodyInit | null;
   statusCode: number | undefined;
   statusText: string | undefined;
@@ -28,12 +70,9 @@ export class KyukoResponse {
     this.#fetchEvent = fetchEvent;
   }
 
-  /**
-   * Sets the status code to `status`, and returns `this`.
-   */
-  status(status: number): this {
+  status(status: number) {
     this.statusCode = status;
-    const statusText = KyukoResponse.STATUSES.get(status);
+    const statusText = KyukoResponseImpl.STATUSES.get(status);
     if (statusText !== undefined) {
       this.statusText = statusText;
     }
@@ -41,29 +80,13 @@ export class KyukoResponse {
     return this;
   }
 
-  /**
-   * Redirects the request to a new `address`.
-   * The `address` can be either a relative url path, or a full url.
-   * The optional `status` parameter can be used to set a custom status code.
-   * Otherwise overrides the current `res.statusCode` with 302.
-   *
-   * @param address The address to redirect to.
-   * @param status The status code of the response. Defaults to 302.
-   */
-  redirect(address: string, status = 302): void {
+  redirect(address: string, status = 302) {
     this.status(status);
     this.headers.append("Location", encodeURI(address));
     this.send();
   }
 
-  /**
-   * Sends a response to the original request that instantiated this object.
-   * The response is built using the public attributes of this object,
-   * which should've been set by the user beforehand.
-   *
-   * @param body A response body that would supersede `this.body`
-   */
-  send(body?: BodyInit): void {
+  send(body?: BodyInit) {
     if (!this.#sent) {
       const response = new Response(
         body || this.body,
@@ -79,10 +102,7 @@ export class KyukoResponse {
     }
   }
 
-  /**
-   * @returns Whether the response was sent (`send()` was called) or not.
-   */
-  wasSent(): boolean {
+  wasSent() {
     return this.#sent;
   }
 

@@ -2,7 +2,8 @@
 
 /// <reference path='./deploy.d.ts' />
 
-import { KyukoResponse } from "./KyukoResponse.ts";
+import { KyukoRequest, KyukoRequestImpl } from "./KyukoRequest.ts";
+import { KyukoResponse, KyukoResponseImpl } from "./KyukoResponse.ts";
 import { RoutePathHandler } from "./RoutePathHandler.ts";
 
 /**
@@ -19,31 +20,12 @@ export type KyukoRequestHandler = (
  * and return early by calling `res.send()` when needed.
  * Hands over execution to the next middleware / request handler on return.
  *
- * Notice how a `next()` call is unneeded.
+ * Notice how a `next()` call is unneeded unlike middleware functions in Express.
  */
 export type KyukoMiddleware = (
   | ((req: KyukoRequest, res: KyukoResponse) => void)
   | ((req: KyukoRequest, res: KyukoResponse) => Promise<void>)
 );
-
-/**
- * Request that gets passed into a `KyukoRequestHandler`.
- * Can be extended further for middlewares to populate the original `Request`.
- */
-export interface KyukoRequest extends Request {
-  /**
-   * Stores path parameters and their values in an object.
-   */
-  params: {
-    [key: string]: string;
-  };
-
-  /**
-   * Stores query parameters and their values.
-   * Note that duplicate keys may map to different values.
-   */
-  query: URLSearchParams;
-}
 
 /**
  * An ultra-light framework for API servers hosted on [Deno Deploy](https://deno.com/deploy).
@@ -57,7 +39,13 @@ export class Kyuko {
 
   /**
    * Initializes a new Kyuko app.
-   * Supports routing for GET, POST, PUT, DELETE methods as of now.
+   * Supports routing for the following methods as of now:
+   *   - GET
+   *   - POST
+   *   - PUT
+   *   - DELETE
+   *   - PATCH
+   *   - HEAD
    */
   constructor() {
     this.#routes = new RoutePathHandler();
@@ -195,10 +183,8 @@ export class Kyuko {
   }
 
   private handleFetchEvent(event: FetchEvent) {
-    const req = event.request as KyukoRequest;
-    req.params = {};
-    req.query = new URLSearchParams();
-    const res = new KyukoResponse(event);
+    const req = new KyukoRequestImpl(event);
+    const res = new KyukoResponseImpl(event);
     this.handleRequest(req, res);
   }
 
