@@ -4,7 +4,7 @@
 
 /**
  * The request object that is handled in Kyuko applications.
- * Can be extended further for middlewares to populate the original `Request`.
+ * Can be extended further for middleware to populate the original `Request`.
  */
 export interface KyukoRequest extends Request {
   /**

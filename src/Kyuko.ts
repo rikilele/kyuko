@@ -40,7 +40,7 @@ export type KyukoErrorHandler = (
  */
 export class Kyuko {
   #routes;
-  #middlewares: KyukoMiddleware[];
+  #middleware: KyukoMiddleware[];
   #errorHandlers: KyukoErrorHandler[];
   #defaultHandler: KyukoRequestHandler;
   #customHandlers: Map<string, Map<string, KyukoRequestHandler>>;
@@ -57,7 +57,7 @@ export class Kyuko {
    */
   constructor() {
     this.#routes = new RoutePathHandler();
-    this.#middlewares = [];
+    this.#middleware = [];
     this.#errorHandlers = [];
     this.#defaultHandler = (_, res) => res.status(404).send();
     this.#customHandlers = new Map();
@@ -184,11 +184,11 @@ export class Kyuko {
   }
 
   /**
-   * Adds `middleware` to a list of application-level middlewares to run.
-   * Middlewares are invoked in order of addition via `use()`.
+   * Adds `middleware` to a list of application-level middleware to run.
+   * Middleware are invoked in order of addition via `use()`.
    */
   use(middleware: KyukoMiddleware) {
-    this.#middlewares.push(middleware);
+    this.#middleware.push(middleware);
   }
 
   /**
@@ -238,7 +238,7 @@ export class Kyuko {
   ) {
     // Run middleware and request handler
     try {
-      for (const middleware of this.#middlewares) {
+      for (const middleware of this.#middleware) {
         await middleware(req, res);
       }
 
