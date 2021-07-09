@@ -91,7 +91,7 @@ export class KyukoResponseImpl implements KyukoResponse {
 
   redirect(address: string, status = 302) {
     if (this.#sent) {
-      throw new Error("Can't set headers after they are sent");
+      throw new Error("Can't send multiple responses to a single request");
     }
 
     this.status(status);
@@ -111,7 +111,7 @@ export class KyukoResponseImpl implements KyukoResponse {
 
   send(body?: BodyInit) {
     if (this.#sent) {
-      throw new Error("Can't set headers after they are sent");
+      throw new Error("Can't send multiple responses to a single request");
     }
 
     const response = new Response(
