@@ -16,7 +16,7 @@ It aims to provide a similar experience to developing API servers with
 Deployed at https://kyuko.deno.dev
 
 ```ts
-import { Kyuko } from "https://deno.land/x/kyuko@v0.2.0/mod.ts";
+import { Kyuko } from "https://deno.land/x/kyuko/mod.ts";
 
 const app = new Kyuko();
 
