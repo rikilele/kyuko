@@ -10,11 +10,11 @@ name: ci
 
 on:
   push:
-    branches: 
+    branches:
       - main
       - develop
   pull_request:
-    branches: 
+    branches:
       - main
       - develop
 
@@ -48,8 +48,8 @@ jobs:
         run: deno lint
 
       # Uncomment this step when we start using dependencies
-      # - name: Cache dependencies
-      #   run: deno cache deps.ts
+      - name: Cache dependencies
+        run: deno cache src/deps.ts
 
       - name: Run tests
         run: deno test -A --unstable

@@ -2,6 +2,7 @@
 
 /// <reference path='./deploy.d.ts' />
 
+import { brightRed } from "./deps.ts";
 import { KyukoRequest, KyukoRequestImpl } from "./KyukoRequest.ts";
 import { KyukoResponse, KyukoResponseImpl } from "./KyukoResponse.ts";
 import { RoutePathHandler } from "./RoutePathHandler.ts";
@@ -246,7 +247,11 @@ export class Kyuko {
 
       // Catch error from middleware OR request handler
     } catch (err1) {
-      console.error("A KyukoMiddleware or KyukoRequestHandler threw an error:");
+      console.error(
+        brightRed(
+          "Error thrown when calling a KyukoMiddleware / KyukoRequestHandler:",
+        ),
+      );
       console.error(err1);
 
       // Run error handlers
@@ -257,7 +262,9 @@ export class Kyuko {
 
         // Catch error from error handler
       } catch (err2) {
-        console.error("A KyukoErrorHandler threw an error:");
+        console.error(
+          brightRed("Error thrown when calling a KyukoErrorHandler:"),
+        );
         console.error(err2);
       }
 

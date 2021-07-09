@@ -82,7 +82,7 @@ export class KyukoResponseImpl implements KyukoResponse {
 
   redirect(address: string, status = 302) {
     if (this.#sent) {
-      return KyukoResponseImpl.warnMultipleSends();
+      throw new Error("Can't set headers after they are sent");
     }
 
     this.status(status);
@@ -92,7 +92,7 @@ export class KyukoResponseImpl implements KyukoResponse {
 
   send(body?: BodyInit) {
     if (this.#sent) {
-      return KyukoResponseImpl.warnMultipleSends();
+      throw new Error("Can't set headers after they are sent");
     }
 
     const response = new Response(
@@ -110,10 +110,6 @@ export class KyukoResponseImpl implements KyukoResponse {
 
   wasSent() {
     return this.#sent;
-  }
-
-  private static warnMultipleSends() {
-    console.error("Error: Can't set headers after they are sent");
   }
 
   /*
