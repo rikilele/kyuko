@@ -1,5 +1,5 @@
 [![ci](https://github.com/rikilele/kyuko/actions/workflows/ci.yml/badge.svg)](https://github.com/rikilele/kyuko/actions/workflows/ci.yml)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/rikilele/kyuko)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/rikilele/kyuko)](https://github.com/rikilele/kyuko/releases)
 [![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/kyuko/mod.ts)
 
 > Fast, unopinionated, minimalist web framework for Deno Deploy 🦕
