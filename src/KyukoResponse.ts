@@ -32,6 +32,15 @@ export interface KyukoResponse {
   redirect(address: string, status?: number): void;
 
   /**
+   * Sends a proper json response to the original request.
+   * The json is `stringify`'d from the input JavaScript `object`.
+   *
+   * @param object The object to respond with.
+   */
+  // deno-lint-ignore no-explicit-any
+  json(object: any): void;
+
+  /**
    * Sends a response to the original request that instantiated this object.
    * The response is built using the public attributes of this object,
    * which should've been set by the user beforehand.
@@ -82,7 +91,7 @@ export class KyukoResponseImpl implements KyukoResponse {
 
   redirect(address: string, status = 302) {
     if (this.#sent) {
-      throw new Error("Can't set headers after they are sent");
+      throw new Error("Can't send multiple responses to a single request");
     }
 
     this.status(status);
@@ -90,9 +99,19 @@ export class KyukoResponseImpl implements KyukoResponse {
     this.send();
   }
 
+  // deno-lint-ignore no-explicit-any
+  json(object: any) {
+    if (this.#sent) {
+      throw new Error("Can't send multiple responses to a single request");
+    }
+
+    this.headers.append("content-type", "application/json; charset=UTF-8");
+    this.send(JSON.stringify(object));
+  }
+
   send(body?: BodyInit) {
     if (this.#sent) {
-      throw new Error("Can't set headers after they are sent");
+      throw new Error("Can't send multiple responses to a single request");
     }
 
     const response = new Response(
