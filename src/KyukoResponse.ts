@@ -1,6 +1,8 @@
 // Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
 
-/// <reference path='./deploy.d.ts' />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.fetchevent.d.ts" />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.ns.d.ts" />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.window.d.ts" />
 
 /**
  * The response object that is handled in Kyuko applications.
