@@ -41,22 +41,18 @@ export type KyukoErrorHandler = (
  * An ultra-light framework for API servers hosted on [Deno Deploy](https://deno.com/deploy).
  * Aims to provide a similar experience to developing API servers with [Express](https://expressjs.com/).
  *
- *
- * **Route methods**
+ * ## Route methods
  *
  * Kyuko currently supports the following HTTP methods:
- *
- * <ul>
- *   <li>GET</li>
- *   <li>POST</li>
- *   <li>PUT</li>
- *   <li>DELETE</li>
- *   <li>PATCH</li>
- *   <li>HEAD</li>
- * </ul>
+ * * • GET
+ * * • POST
+ * * • PUT
+ * * • DELETE
+ * * • PATCH
+ * * • HEAD
  *
  *
- * **Route paths**
+ * ## Route paths
  *
  * Route paths define endpoints at which requests can be made.
  * Kyuko internally uses the
@@ -78,13 +74,11 @@ export type KyukoErrorHandler = (
  * The behavior for when a route path consisting of other characters is registered is undefined.
  *
  *
- * Note on handling of slashes in paths:
+ * ### Note on handling of slashes in paths:
  *
- * <ul>
- *   <li>Recurring leading slashes will be merged and considered as one slash</li>
- *   <li>Recurring slashes that appear mid-path will contribute to empty paths</li>
- *   <li>A single trailing slash will be ignored</li>
- * </ul>
+ * * • Recurring leading slashes will be merged and considered as one slash
+ * * • Recurring slashes that appear mid-path will contribute to empty paths
+ * * • A single trailing slash will be ignored
  *
  * For more details, refer to [RFC3986](https://datatracker.ietf.org/doc/html/rfc3986).
  */
