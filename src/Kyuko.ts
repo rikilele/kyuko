@@ -41,27 +41,30 @@ export type KyukoErrorHandler = (
  * An ultra-light framework for API servers hosted on [Deno Deploy](https://deno.com/deploy).
  * Aims to provide a similar experience to developing API servers with [Express](https://expressjs.com/).
  *
+ *
  * **Route methods**
  *
  * Kyuko currently supports the following HTTP methods:
  *
- * * GET
- * * POST
- * * PUT
- * * DELETE
- * * PATCH
- * * HEAD
+ * <ul>
+ *   <li>GET</li>
+ *   <li>POST</li>
+ *   <li>PUT</li>
+ *   <li>DELETE</li>
+ *   <li>PATCH</li>
+ *   <li>HEAD</li>
+ * </ul>
+ *
  *
  * **Route paths**
  *
  * Route paths define endpoints at which requests can be made.
- *
- * > Kyuko internally uses the [`URL.pathname`](https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname)
- * > property to match url paths with route paths.
- *
+ * Kyuko internally uses the
+ * [`URL.pathname`](https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname)
+ * property to match url paths with route paths.
  * Route paths consist of segments that can either be concrete or a wildcard.
  * In the following example, `users` is a concrete segment, while `:userId` is a wildcard segment.
- * The example will handle requests that are sent to "/users/Alice", "/users/Bob", etc.
+ * The example will handle requests that are sent to `"/users/Alice"`, `"/users/Bob"`, etc.
  *
  * ```ts
  * app.get("/users/:userId", (req, res) => {
@@ -74,12 +77,16 @@ export type KyukoErrorHandler = (
  * [RFC3986 section 2.3](https://datatracker.ietf.org/doc/html/rfc3986#section-2.3).
  * The behavior for when a route path consisting of other characters is registered is undefined.
  *
- * Note on handling of slashes in paths:
- * * Recurring leading slashes will be merged and considered as one slash
- * * Recurring slashes that appear mid-path will contribute to empty paths
- * * A single trailing slash will be ignored
  *
- * For more details, read more on [RFC3986](https://datatracker.ietf.org/doc/html/rfc3986).
+ * Note on handling of slashes in paths:
+ *
+ * <ul>
+ *   <li>Recurring leading slashes will be merged and considered as one slash</li>
+ *   <li>Recurring slashes that appear mid-path will contribute to empty paths</li>
+ *   <li>A single trailing slash will be ignored</li>
+ * </ul>
+ *
+ * For more details, refer to [RFC3986](https://datatracker.ietf.org/doc/html/rfc3986).
  */
 export class Kyuko {
   #routes;
