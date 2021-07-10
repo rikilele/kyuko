@@ -18,5 +18,14 @@
   },
   "cSpell.words": [
     "Kyuko"
-  ]
+  ],
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": ".*",
+        "isAsync": true,
+        "cmd": "deno fmt"
+      }
+    ]
+  }
 }
