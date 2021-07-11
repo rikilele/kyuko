@@ -17,7 +17,8 @@
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "cSpell.words": [
-    "Kyuko"
+    "Kyuko",
+    "deployctl"
   ],
   "emeraldwalk.runonsave": {
     "commands": [
