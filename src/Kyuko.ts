@@ -1,8 +1,8 @@
 // Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
 
-/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.fetchevent.d.ts" />
-/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.ns.d.ts" />
-/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.window.d.ts" />
+/// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.fetchevent.d.ts" />
+/// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.ns.d.ts" />
+/// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.window.d.ts" />
 
 import { brightRed } from "./deps.ts";
 import { KyukoRequest, KyukoRequestImpl } from "./KyukoRequest.ts";
