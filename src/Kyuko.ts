@@ -268,7 +268,9 @@ export class Kyuko {
         await middleware(req, res);
       }
 
-      handler(req, res);
+      if (!res.wasSent) {
+        handler(req, res);
+      }
 
       // Catch error from middleware OR route handler
     } catch (err1) {
