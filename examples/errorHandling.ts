@@ -8,7 +8,9 @@ const app = new Kyuko();
  * This will handle the error thrown.
  */
 app.error((err, _req, res) => {
-  res.send(err.message);
+  if (!res.wasSent()) {
+    res.send(err.message);
+  }
 });
 
 app.get("/", (_req, _res) => {

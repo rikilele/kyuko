@@ -1,6 +1,8 @@
 // Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
 
-/// <reference path='./deploy.d.ts' />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.fetchevent.d.ts" />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.ns.d.ts" />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.window.d.ts" />
 
 /**
  * The response object that is handled in Kyuko applications.
@@ -30,6 +32,15 @@ export interface KyukoResponse {
    * @param status The status code of the response. Defaults to 302.
    */
   redirect(address: string, status?: number): void;
+
+  /**
+   * Sends a proper json response to the original request.
+   * The json is `stringify`'d from the input JavaScript `object`.
+   *
+   * @param object The object to respond with.
+   */
+  // deno-lint-ignore no-explicit-any
+  json(object: any): void;
 
   /**
    * Sends a response to the original request that instantiated this object.
@@ -82,7 +93,7 @@ export class KyukoResponseImpl implements KyukoResponse {
 
   redirect(address: string, status = 302) {
     if (this.#sent) {
-      return KyukoResponseImpl.warnMultipleSends();
+      throw new Error("Can't send multiple responses to a single request");
     }
 
     this.status(status);
@@ -90,9 +101,19 @@ export class KyukoResponseImpl implements KyukoResponse {
     this.send();
   }
 
+  // deno-lint-ignore no-explicit-any
+  json(object: any) {
+    if (this.#sent) {
+      throw new Error("Can't send multiple responses to a single request");
+    }
+
+    this.headers.append("content-type", "application/json; charset=UTF-8");
+    this.send(JSON.stringify(object));
+  }
+
   send(body?: BodyInit) {
     if (this.#sent) {
-      return KyukoResponseImpl.warnMultipleSends();
+      throw new Error("Can't send multiple responses to a single request");
     }
 
     const response = new Response(
@@ -110,10 +131,6 @@ export class KyukoResponseImpl implements KyukoResponse {
 
   wasSent() {
     return this.#sent;
-  }
-
-  private static warnMultipleSends() {
-    console.error("Error: Can't set headers after they are sent");
   }
 
   /*

@@ -1,10 +1,12 @@
 // Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
 
-/// <reference path='./deploy.d.ts' />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.fetchevent.d.ts" />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.ns.d.ts" />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.window.d.ts" />
 
 /**
  * The request object that is handled in Kyuko applications.
- * Can be extended further for middlewares to populate the original `Request`.
+ * Can be extended further for middleware to populate the original `Request`.
  */
 export interface KyukoRequest extends Request {
   /**

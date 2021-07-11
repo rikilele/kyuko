@@ -1,7 +1,10 @@
 // Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
 
-/// <reference path='./deploy.d.ts' />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.fetchevent.d.ts" />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.ns.d.ts" />
+/// <reference path="https://raw.githubusercontent.com/denoland/deployctl/main/types/deploy.window.d.ts" />
 
+import { brightRed } from "./deps.ts";
 import { KyukoRequest, KyukoRequestImpl } from "./KyukoRequest.ts";
 import { KyukoResponse, KyukoResponseImpl } from "./KyukoResponse.ts";
 import { RoutePathHandler } from "./RoutePathHandler.ts";
@@ -10,14 +13,14 @@ import { RoutePathHandler } from "./RoutePathHandler.ts";
  * A function that is invoked in response to fetch requests.
  * Runs after all middleware functions have been called.
  */
-export type KyukoRequestHandler = (
+export type KyukoRouteHandler = (
   | ((req: KyukoRequest, res: KyukoResponse) => void)
   | ((req: KyukoRequest, res: KyukoResponse) => Promise<void>)
 );
 
 /**
- * A function that is invoked before the request handler is called.
- * Hands over execution to the next middleware / request handler on return.
+ * A function that is invoked before the route handler is called.
+ * Hands over execution to the next middleware / route handler on return.
  */
 export type KyukoMiddleware = (
   | ((req: KyukoRequest, res: KyukoResponse) => void)
@@ -35,29 +38,22 @@ export type KyukoErrorHandler = (
 );
 
 /**
- * An ultra-light framework for API servers hosted on [Deno Deploy](https://deno.com/deploy).
- * Aims to provide a similar experience to developing API servers with [Express](https://expressjs.com/).
+ * An ultra-light framework for http servers hosted on [Deno Deploy](https://deno.com/deploy).
+ * Visit the [guide](https://github.com/rikilele/kyuko#guide) for more information.
  */
 export class Kyuko {
   #routes;
-  #middlewares: KyukoMiddleware[];
+  #middleware: KyukoMiddleware[];
   #errorHandlers: KyukoErrorHandler[];
-  #defaultHandler: KyukoRequestHandler;
-  #customHandlers: Map<string, Map<string, KyukoRequestHandler>>;
+  #defaultHandler: KyukoRouteHandler;
+  #customHandlers: Map<string, Map<string, KyukoRouteHandler>>;
 
   /**
    * Initializes a new Kyuko app.
-   * Supports routing for the following methods as of now:
-   *   - GET
-   *   - POST
-   *   - PUT
-   *   - DELETE
-   *   - PATCH
-   *   - HEAD
    */
   constructor() {
     this.#routes = new RoutePathHandler();
-    this.#middlewares = [];
+    this.#middleware = [];
     this.#errorHandlers = [];
     this.#defaultHandler = (_, res) => res.status(404).send();
     this.#customHandlers = new Map();
@@ -82,7 +78,7 @@ export class Kyuko {
    * });
    * ```
    */
-  get(routePath: string, handler: KyukoRequestHandler) {
+  get(routePath: string, handler: KyukoRouteHandler) {
     this.#routes.addRoutePath(routePath);
     this.#customHandlers.get("GET")?.set(routePath, handler);
   }
@@ -91,7 +87,7 @@ export class Kyuko {
    * Registers a `handler` that is invoked when
    * POST requests are made to url paths that match the `routePath`.
    */
-  post(routePath: string, handler: KyukoRequestHandler) {
+  post(routePath: string, handler: KyukoRouteHandler) {
     this.#routes.addRoutePath(routePath);
     this.#customHandlers.get("POST")?.set(routePath, handler);
   }
@@ -112,7 +108,7 @@ export class Kyuko {
    * });
    * ```
    */
-  put(routePath: string, handler: KyukoRequestHandler) {
+  put(routePath: string, handler: KyukoRouteHandler) {
     this.#routes.addRoutePath(routePath);
     this.#customHandlers.get("PUT")?.set(routePath, handler);
   }
@@ -121,7 +117,7 @@ export class Kyuko {
    * Registers a `handler` that is invoked when
    * DELETE requests are made to url paths that match the `routePath`.
    */
-  delete(routePath: string, handler: KyukoRequestHandler) {
+  delete(routePath: string, handler: KyukoRouteHandler) {
     this.#routes.addRoutePath(routePath);
     this.#customHandlers.get("DELETE")?.set(routePath, handler);
   }
@@ -130,7 +126,7 @@ export class Kyuko {
    * Registers a `handler` that is invoked when
    * PATCH requests are made to url paths that match the `routePath`.
    */
-  patch(routePath: string, handler: KyukoRequestHandler) {
+  patch(routePath: string, handler: KyukoRouteHandler) {
     this.#routes.addRoutePath(routePath);
     this.#customHandlers.get("PATCH")?.set(routePath, handler);
   }
@@ -149,7 +145,7 @@ export class Kyuko {
    * });
    * ```
    */
-  head(routePath: string, handler: KyukoRequestHandler) {
+  head(routePath: string, handler: KyukoRouteHandler) {
     this.#routes.addRoutePath(routePath);
     this.#customHandlers.get("HEAD")?.set(routePath, handler);
   }
@@ -158,7 +154,7 @@ export class Kyuko {
    * Registers a `handler` that is invoked when
    * any type of requests are made to url paths that match the `routePath`.
    */
-  all(routePath: string, handler: KyukoRequestHandler) {
+  all(routePath: string, handler: KyukoRouteHandler) {
     this.#routes.addRoutePath(routePath);
     this.#customHandlers.get("GET")?.set(routePath, handler);
     this.#customHandlers.get("POST")?.set(routePath, handler);
@@ -170,25 +166,16 @@ export class Kyuko {
    * Registers a default `handler` that is invoked when
    * a request isn't caught by any other custom handlers.
    */
-  default(handler: KyukoRequestHandler) {
+  default(handler: KyukoRouteHandler) {
     this.#defaultHandler = handler;
   }
 
   /**
-   * Starts listening to 'fetch' requests.
-   * @param callback Called when server starts listening.
-   */
-  listen(callback?: VoidFunction) {
-    addEventListener("fetch", this.handleFetchEvent.bind(this));
-    callback && callback();
-  }
-
-  /**
-   * Adds `middleware` to a list of application-level middlewares to run.
-   * Middlewares are invoked in order of addition via `use()`.
+   * Adds `middleware` to a list of application-level middleware to run.
+   * Middleware are invoked in order of addition via `use()`.
    */
   use(middleware: KyukoMiddleware) {
-    this.#middlewares.push(middleware);
+    this.#middleware.push(middleware);
   }
 
   /**
@@ -201,22 +188,27 @@ export class Kyuko {
     this.#errorHandlers.push(errorHandler);
   }
 
+  /**
+   * Starts listening to 'fetch' requests.
+   * @param callback Called when server starts listening.
+   */
+  listen(callback?: VoidFunction) {
+    addEventListener("fetch", this.handleFetchEvent.bind(this));
+    callback && callback();
+  }
+
   private handleFetchEvent(event: FetchEvent) {
     const req = new KyukoRequestImpl(event);
     const res = new KyukoResponseImpl(event);
-    this.handleRequest(req, res);
-  }
-
-  private handleRequest(req: KyukoRequest, res: KyukoResponse) {
     const { pathname, searchParams } = new URL(req.url);
-    let handler: KyukoRequestHandler = this.#defaultHandler;
 
     // Handle routing
+    let handler: KyukoRouteHandler = this.#defaultHandler;
     const routePath = this.#routes.findMatch(pathname);
     if (routePath !== undefined) {
       const customHandlers = this.#customHandlers.get(req.method);
       if (customHandlers?.has(routePath)) {
-        handler = customHandlers.get(routePath) as KyukoRequestHandler;
+        handler = customHandlers.get(routePath) as KyukoRouteHandler;
       }
 
       // Fill req.params
@@ -234,19 +226,21 @@ export class Kyuko {
   private async invokeHandlers(
     req: KyukoRequest,
     res: KyukoResponse,
-    handler: KyukoRequestHandler,
+    handler: KyukoRouteHandler,
   ) {
-    // Run middleware and request handler
+    // Run middleware and route handler
     try {
-      for (const middleware of this.#middlewares) {
+      for (const middleware of this.#middleware) {
         await middleware(req, res);
       }
 
-      handler(req, res);
+      if (!res.wasSent) {
+        handler(req, res);
+      }
 
-      // Catch error from middleware OR request handler
+      // Catch error from middleware OR route handler
     } catch (err1) {
-      console.error("A KyukoMiddleware or KyukoRequestHandler threw an error:");
+      console.error(brightRed("Error in KyukoMiddleware / KyukoRouteHandler:"));
       console.error(err1);
 
       // Run error handlers
@@ -257,7 +251,7 @@ export class Kyuko {
 
         // Catch error from error handler
       } catch (err2) {
-        console.error("A KyukoErrorHandler threw an error:");
+        console.error(brightRed("Error in KyukoErrorHandler:"));
         console.error(err2);
       }
 
