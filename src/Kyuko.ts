@@ -234,7 +234,7 @@ export class Kyuko {
         await middleware(req, res);
       }
 
-      if (!res.wasSent) {
+      if (!res.wasSent()) {
         handler(req, res);
       }
 
