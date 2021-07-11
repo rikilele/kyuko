@@ -230,14 +230,10 @@ export class Kyuko {
   private handleFetchEvent(event: FetchEvent) {
     const req = new KyukoRequestImpl(event);
     const res = new KyukoResponseImpl(event);
-    this.handleRequest(req, res);
-  }
-
-  private handleRequest(req: KyukoRequest, res: KyukoResponse) {
     const { pathname, searchParams } = new URL(req.url);
-    let handler: KyukoRouteHandler = this.#defaultHandler;
 
     // Handle routing
+    let handler: KyukoRouteHandler = this.#defaultHandler;
     const routePath = this.#routes.findMatch(pathname);
     if (routePath !== undefined) {
       const customHandlers = this.#customHandlers.get(req.method);
@@ -274,9 +270,7 @@ export class Kyuko {
 
       // Catch error from middleware OR route handler
     } catch (err1) {
-      console.error(
-        brightRed("Error thrown from a KyukoMiddleware / KyukoRouteHandler:"),
-      );
+      console.error(brightRed("Error in KyukoMiddleware / KyukoRouteHandler:"));
       console.error(err1);
 
       // Run error handlers
@@ -287,7 +281,7 @@ export class Kyuko {
 
         // Catch error from error handler
       } catch (err2) {
-        console.error(brightRed("Error thrown from a KyukoErrorHandler:"));
+        console.error(brightRed("Error in KyukoErrorHandler:"));
         console.error(err2);
       }
 
