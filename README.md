@@ -138,7 +138,7 @@ is undefined.
 For more detail, refer to
 [RFC3986](https://datatracker.ietf.org/doc/html/rfc3986).
 
-**[⬆ back to top](#guide)**
+**[↑ back to top](#guide)**
 
 ## Middleware
 
@@ -176,7 +176,7 @@ Take note of the following points when choosing to send responses in middleware:
 1. The route handler that was assigned to the request **will not run** if a
    middleware responds early
 
-**[⬆ back to top](#guide)**
+**[↑ back to top](#guide)**
 
 ## Error Handling
 
@@ -212,7 +212,7 @@ Error handlers can perform the following tasks:
 Check `res.wasSent()` before sending a response from an error handler to make
 sure that a response wasn't sent already.
 
-**[⬆ back to top](#guide)**
+**[↑ back to top](#guide)**
 
 ## Event Lifecycle
 
@@ -289,4 +289,4 @@ responded to within a Kyuko app:
 
 ---
 
-**[⬆ back to top](#guide)**
+**[↑ back to top](#guide)**
