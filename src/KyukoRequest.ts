@@ -4,17 +4,11 @@
 /// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.ns.d.ts" />
 /// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.window.d.ts" />
 
-import { v4 } from "./deps.ts";
-
 /**
  * The request object that is handled in Kyuko applications.
  * Can be extended further for middleware to populate the original `Request`.
  */
 export interface KyukoRequest extends Request {
-  /**
-   * A RFC4122 v4 UUID for the request.
-   */
-  uuid: string;
   /**
    * Stores path parameters and their values in an object.
    */
@@ -34,7 +28,6 @@ export interface KyukoRequest extends Request {
  * The instance is populated by the original request handed over from the event listener.
  */
 export class KyukoRequestImpl extends Request implements KyukoRequest {
-  uuid: string;
   params: { [key: string]: string };
   query: URLSearchParams;
 
@@ -44,7 +37,6 @@ export class KyukoRequestImpl extends Request implements KyukoRequest {
    */
   constructor(fetchEvent: FetchEvent) {
     super(fetchEvent.request);
-    this.uuid = v4.generate();
     this.params = {};
     this.query = new URLSearchParams();
   }
