@@ -1,3 +1,5 @@
+// Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
+
 import { KyukoMiddleware, KyukoRequest } from "../mod.ts";
 
 /**
