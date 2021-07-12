@@ -53,7 +53,7 @@ export function basicAuth(
   realm = "Access to app",
   sendResponse = false,
 ): KyukoMiddleware {
-  return async function (req: KyukoRequest, res: KyukoResponse) {
+  return async function basicAuth(req: KyukoRequest, res: KyukoResponse) {
     const _req = req as WithBasicAuth;
     _req.basicAuth = {
       realm,
