@@ -2,7 +2,7 @@
 
 import { Kyuko } from "../mod.ts";
 import { decodeParams } from "../middleware/decodeParams.ts";
-import { json, KyukoRequestWithJson } from "../middleware/json.ts";
+import { json, WithBody } from "../middleware/json.ts";
 
 const app = new Kyuko();
 
@@ -20,7 +20,7 @@ app.get("/:name", (req, res) => {
  * Responds with a pretty version of the JSON request body.
  */
 app.post("/", (req, res) => {
-  const { requestBody } = req as KyukoRequestWithJson;
+  const { requestBody } = req as WithBody;
   res.send(JSON.stringify(requestBody, null, 2));
 });
 
