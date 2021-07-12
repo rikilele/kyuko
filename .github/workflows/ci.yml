@@ -24,7 +24,9 @@ jobs:
 
     strategy:
       matrix:
-        deno: ["v1.x", "canary"]
+        deno:
+          - "v1.x"
+          - "canary"
         os:
           - macOS-latest
           # - windows-latest
@@ -55,4 +57,4 @@ jobs:
         run: deno cache src/dev_deps.ts
 
       - name: Run tests
-        run: deno test -A --unstable
+        run: deno test
