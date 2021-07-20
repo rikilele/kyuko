@@ -36,9 +36,9 @@ export interface WithBasicAuth extends KyukoRequest {
  * A function that returns `true` if the username and password are valid.
  */
 export type Authenticator = (
-  | ((username: string, password: string) => boolean)
-  | ((username: string, password: string) => Promise<boolean>)
-);
+  username: string,
+  password: string,
+) => Promise<boolean> | boolean;
 
 /**
  * Returns a `KyukoMiddleware` that handles basic authentication.
