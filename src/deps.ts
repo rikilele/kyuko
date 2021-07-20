@@ -1,1 +1,1 @@
-export { brightRed } from "https://deno.land/std@0.100.0/fmt/colors.ts";
+export { brightRed } from "https://deno.land/std@0.102.0/fmt/colors.ts";
