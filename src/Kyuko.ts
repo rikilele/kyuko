@@ -204,12 +204,12 @@ export class Kyuko {
     const { pathname, searchParams } = new URL(req.url);
 
     // Handle routing
-    let handler: KyukoRouteHandler = this.#defaultHandler;
+    let routeHandler: KyukoRouteHandler = this.#defaultHandler;
     const routePath = this.#routes.findMatch(pathname);
     if (routePath !== undefined) {
       const customHandlers = this.#customHandlers.get(req.method);
       if (customHandlers?.has(routePath)) {
-        handler = customHandlers.get(routePath) as KyukoRouteHandler;
+        routeHandler = customHandlers.get(routePath) as KyukoRouteHandler;
       }
 
       // Fill req.params
@@ -221,44 +221,49 @@ export class Kyuko {
       req.query.append(key, value);
     });
 
-    this.invokeHandlers(req, res, handler);
+    this.invokeHandlers(req, res, routeHandler);
   }
 
   private async invokeHandlers(
     req: KyukoRequest,
     res: KyukoResponse,
-    handler: KyukoRouteHandler,
+    routeHandler: KyukoRouteHandler,
   ) {
-    // Run middleware and route handler
+    // Run middleware
     try {
       for (const middleware of this.#middleware) {
         await middleware(req, res);
       }
+    } catch (err) {
+      console.error(brightRed("Error in KyukoMiddleware:"));
+      console.error(err);
+      this.handleError(err, req, res);
+    }
 
+    // Run route handler
+    try {
       if (!res.wasSent()) {
-        handler(req, res);
+        await routeHandler(req, res);
       }
+    } catch (err) {
+      console.error(brightRed("Error in KyukoRouteHandler:"));
+      console.error(err);
+      this.handleError(err, req, res);
+    }
+  }
 
-      // Catch error from middleware OR route handler
-    } catch (err1) {
-      console.error(brightRed("Error in KyukoMiddleware / KyukoRouteHandler:"));
-      console.error(err1);
-
-      // Run error handlers
-      try {
-        for (const errorHandler of this.#errorHandlers) {
-          await errorHandler(err1, req, res);
-        }
-
-        // Catch error from error handler
-      } catch (err2) {
-        console.error(brightRed("Error in KyukoErrorHandler:"));
-        console.error(err2);
+  private async handleError(err: Error, req: KyukoRequest, res: KyukoResponse) {
+    try {
+      for (const errorHandler of this.#errorHandlers) {
+        await errorHandler(err, req, res);
       }
+    } catch (ohShit) {
+      console.error(brightRed("Error in KyukoErrorHandler:"));
+      console.error(ohShit);
+    }
 
-      if (!res.wasSent()) {
-        res.status(500).send();
-      }
+    if (!res.wasSent()) {
+      res.status(500).send();
     }
   }
 }
