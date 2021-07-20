@@ -4,7 +4,7 @@
 /// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.ns.d.ts" />
 /// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.window.d.ts" />
 
-import { brightRed } from "./deps.ts";
+import { brightRed, Status } from "./deps.ts";
 import { KyukoRequest, KyukoRequestImpl } from "./KyukoRequest.ts";
 import { KyukoResponse, KyukoResponseImpl } from "./KyukoResponse.ts";
 import { RoutePathHandler } from "./RoutePathHandler.ts";
@@ -56,7 +56,7 @@ export class Kyuko {
     this.#routes = new RoutePathHandler();
     this.#middleware = [];
     this.#errorHandlers = [];
-    this.#defaultHandler = (_, res) => res.status(404).send();
+    this.#defaultHandler = (_, res) => res.status(Status.NotFound).send();
     this.#customHandlers = new Map();
     this.#customHandlers.set("GET", new Map());
     this.#customHandlers.set("POST", new Map());
@@ -263,7 +263,7 @@ export class Kyuko {
     }
 
     if (!res.wasSent()) {
-      res.status(500).send();
+      res.status(Status.InternalServerError).send();
     }
   }
 }

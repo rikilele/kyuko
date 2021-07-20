@@ -1,5 +1,6 @@
 // Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
 
+import { Status } from "../src/deps.ts";
 import { KyukoMiddleware, KyukoRequest, KyukoResponse } from "../mod.ts";
 
 /**
@@ -81,6 +82,6 @@ function unauthenticated(req: WithBasicAuth, res: KyukoResponse) {
     const { realm } = req.basicAuth;
     res.headers.append("WWW-Authenticate", `Basic: realm="${realm}"`);
     res.headers.append("WWW-Authenticate", 'charset="UTF-8"');
-    res.status(401).send();
+    res.status(Status.Unauthorized).send();
   }
 }
