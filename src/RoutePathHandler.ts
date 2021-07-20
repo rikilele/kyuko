@@ -26,8 +26,8 @@ export class RoutePathHandler {
    */
   static createPathParams(routePath: string, urlPath: string) {
     const result: { [key: string]: string } = {};
-    const routeSegments = this.splitPathSegments(routePath);
-    const urlSegments = this.splitPathSegments(urlPath);
+    const routeSegments = RoutePathHandler.splitPathSegments(routePath);
+    const urlSegments = RoutePathHandler.splitPathSegments(urlPath);
     routeSegments.forEach((routeSegment, i) => {
       if (routeSegment.startsWith(":")) {
         result[routeSegment.substring(1)] = urlSegments[i];
@@ -88,7 +88,7 @@ export class RoutePathHandler {
       return undefined;
     }
 
-    return finalists[0].getFullPath();
+    return finalists[0].routePath;
   }
 
   /**
@@ -133,6 +133,12 @@ class RoutePathNode {
    */
   isStationaryNode: boolean;
 
+  /**
+   * The full route path that the node represents.
+   * Dependent on the specific node's parent.
+   */
+  routePath: string;
+
   #value: string;
   #height: number;
   #parent: RoutePathNode | null;
@@ -161,6 +167,17 @@ class RoutePathNode {
     this.#parent = parent;
     this.#concreteChildren = new Map();
     this.#wildcardChildren = new Map();
+
+    // Construct the routePath
+    if (parent === null) {
+      this.routePath = "";
+    } else if (parent.#value === "\0") {
+      this.routePath = "/";
+    } else if (parent.routePath === "/") {
+      this.routePath = `/${value}`;
+    } else {
+      this.routePath = `${parent.routePath}/${value}`;
+    }
   }
 
   /**
@@ -229,32 +246,5 @@ class RoutePathNode {
     });
 
     return result;
-  }
-
-  /**
-   * Traverses through the parents of the node
-   * and constructs the full route path that the node represents.
-   *
-   * @returns The full route path.
-   */
-  getFullPath(): string {
-    /**
-     * Time complexity: O(n)
-     *
-     * We don't use result.unshift() because
-     *   - while loop: O(n)
-     *   - Array.prototype.push(): O(1)
-     *   - Array.prototype.unshift(): O(n)
-     *   - Array.prototype.reverse(): O(n)
-     */
-    const result = [];
-    let node = this as RoutePathNode;
-    while (node.#parent !== null) {
-      result.push(node.#value);
-      node = node.#parent;
-    }
-
-    result.reverse();
-    return result.join("/") || "/";
   }
 }

@@ -94,7 +94,7 @@ Where:
 - `app` is an instance of
   [`Kyuko`](https://doc.deno.land/https/deno.land/x/kyuko/mod.ts#Kyuko)
 - `METHOD` is an http request method in lowercase
-- `PATH` is a valid [route paths](#route-path)
+- `PATH` is a valid [route path](#route-paths)
 - `HANDLER` is the
   [`KyukoRouteHandler`](https://doc.deno.land/https/deno.land/x/kyuko/mod.ts#KyukoRouteHandler)
   executed when the route is matched
@@ -263,17 +263,16 @@ responded to within a Kyuko app:
    completion, unless an error is thrown.
 
    A middleware can choose to respond early to an event by calling `res.send()`,
-   `res.redirect()`, etc. In that case, the `[ROUTE HANDLING]` and
-   `[ERROR HANDLING]` steps will not be taken, and the event lifecycle ends in
-   this step.
+   `res.redirect()`, etc. In that case, the `[ROUTE HANDLING]` step will not be
+   taken, and the event lifecycle ends in this step.
 
 1. **`[ROUTE HANDLING]` Running the route handler**
 
    The **one** route handler that was chosen in the `[ROUTING]` step will be
    executed in this step. The route handler will not run however, if
 
-   - A middleware threw an error
    - A middleware chose to respond early
+   - A middleware threw an error AND the error handler responded early
 
 1. **`[ERROR HANDLING]` Handling errors**
 

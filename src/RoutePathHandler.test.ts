@@ -12,131 +12,178 @@ Deno.test("empty handler", () => {
   assertEquals(pathHandler.findMatch("/users/Alice/friends/Bob"), undefined);
 });
 
-const pathHandler1 = new RoutePathHandler();
-pathHandler1.addRoutePath("/");
-pathHandler1.addRoutePath("/users");
-pathHandler1.addRoutePath("/users/:userId");
-pathHandler1.addRoutePath("/users/:userId/friends");
-pathHandler1.addRoutePath("/users/:userId/friends/:friendId");
-
 Deno.test("handler handles /", () => {
-  assertEquals(pathHandler1.findMatch("/"), "/");
+  const pathHandler = new RoutePathHandler();
+  pathHandler.addRoutePath("/");
+  pathHandler.addRoutePath("/users");
+  pathHandler.addRoutePath("/users/:userId");
+  pathHandler.addRoutePath("/users/:userId/friends");
+  pathHandler.addRoutePath("/users/:userId/friends/:friendId");
+  assertEquals(pathHandler.findMatch("/"), "/");
 });
 
 Deno.test("handler handles /users", () => {
-  assertEquals(pathHandler1.findMatch("/users"), "/users");
+  const pathHandler = new RoutePathHandler();
+  pathHandler.addRoutePath("/");
+  pathHandler.addRoutePath("/users");
+  pathHandler.addRoutePath("/users/:userId");
+  pathHandler.addRoutePath("/users/:userId/friends");
+  pathHandler.addRoutePath("/users/:userId/friends/:friendId");
+  assertEquals(pathHandler.findMatch("/users"), "/users");
 });
 
 Deno.test("handler handles /users/:userId", () => {
-  assertEquals(pathHandler1.findMatch("/users/Alice"), "/users/:userId");
-  assertEquals(pathHandler1.findMatch("/users/Bob"), "/users/:userId");
-  assertEquals(pathHandler1.findMatch("/users/Charlie"), "/users/:userId");
+  const pathHandler = new RoutePathHandler();
+  pathHandler.addRoutePath("/");
+  pathHandler.addRoutePath("/users");
+  pathHandler.addRoutePath("/users/:userId");
+  pathHandler.addRoutePath("/users/:userId/friends");
+  pathHandler.addRoutePath("/users/:userId/friends/:friendId");
+  assertEquals(pathHandler.findMatch("/users/Alice"), "/users/:userId");
+  assertEquals(pathHandler.findMatch("/users/Bob"), "/users/:userId");
+  assertEquals(pathHandler.findMatch("/users/Charlie"), "/users/:userId");
 });
 
 Deno.test("handler handles /users/:userId/friends", () => {
+  const pathHandler = new RoutePathHandler();
+  pathHandler.addRoutePath("/");
+  pathHandler.addRoutePath("/users");
+  pathHandler.addRoutePath("/users/:userId");
+  pathHandler.addRoutePath("/users/:userId/friends");
+  pathHandler.addRoutePath("/users/:userId/friends/:friendId");
   assertEquals(
-    pathHandler1.findMatch("/users/Alice/friends"),
+    pathHandler.findMatch("/users/Alice/friends"),
     "/users/:userId/friends",
   );
   assertEquals(
-    pathHandler1.findMatch("/users/Bob/friends"),
+    pathHandler.findMatch("/users/Bob/friends"),
     "/users/:userId/friends",
   );
   assertEquals(
-    pathHandler1.findMatch("/users/Charlie/friends"),
+    pathHandler.findMatch("/users/Charlie/friends"),
     "/users/:userId/friends",
   );
 });
 
 Deno.test("handler handles /users/:userId/friends/:friendId", () => {
+  const pathHandler = new RoutePathHandler();
+  pathHandler.addRoutePath("/");
+  pathHandler.addRoutePath("/users");
+  pathHandler.addRoutePath("/users/:userId");
+  pathHandler.addRoutePath("/users/:userId/friends");
+  pathHandler.addRoutePath("/users/:userId/friends/:friendId");
   assertEquals(
-    pathHandler1.findMatch("/users/Alice/friends/Bob"),
+    pathHandler.findMatch("/users/Alice/friends/Bob"),
     "/users/:userId/friends/:friendId",
   );
   assertEquals(
-    pathHandler1.findMatch("/users/Alice/friends/Charlie"),
+    pathHandler.findMatch("/users/Alice/friends/Charlie"),
     "/users/:userId/friends/:friendId",
   );
   assertEquals(
-    pathHandler1.findMatch("/users/Bob/friends/Alice"),
+    pathHandler.findMatch("/users/Bob/friends/Alice"),
     "/users/:userId/friends/:friendId",
   );
   assertEquals(
-    pathHandler1.findMatch("/users/Bob/friends/Charlie"),
+    pathHandler.findMatch("/users/Bob/friends/Charlie"),
     "/users/:userId/friends/:friendId",
   );
   assertEquals(
-    pathHandler1.findMatch("/users/Charlie/friends/Alice"),
+    pathHandler.findMatch("/users/Charlie/friends/Alice"),
     "/users/:userId/friends/:friendId",
   );
   assertEquals(
-    pathHandler1.findMatch("/users/Charlie/friends/Bob"),
+    pathHandler.findMatch("/users/Charlie/friends/Bob"),
     "/users/:userId/friends/:friendId",
   );
 });
 
 Deno.test("handler ignores trailing /", () => {
-  assertEquals(pathHandler1.findMatch("/users/"), "/users");
-  assertEquals(pathHandler1.findMatch("/users/Alice/"), "/users/:userId");
+  const pathHandler = new RoutePathHandler();
+  pathHandler.addRoutePath("/");
+  pathHandler.addRoutePath("/users");
+  pathHandler.addRoutePath("/users/:userId");
+  pathHandler.addRoutePath("/users/:userId/friends");
+  pathHandler.addRoutePath("/users/:userId/friends/:friendId");
+  assertEquals(pathHandler.findMatch("/users/"), "/users");
+  assertEquals(pathHandler.findMatch("/users/Alice/"), "/users/:userId");
   assertEquals(
-    pathHandler1.findMatch("/users/Alice/friends/"),
+    pathHandler.findMatch("/users/Alice/friends/"),
     "/users/:userId/friends",
   );
   assertEquals(
-    pathHandler1.findMatch("/users/Alice/friends/Bob/"),
+    pathHandler.findMatch("/users/Alice/friends/Bob/"),
     "/users/:userId/friends/:friendId",
   );
 });
 
 Deno.test("handler ignores multiple leading /", () => {
-  assertEquals(pathHandler1.findMatch("//"), "/");
-  assertEquals(pathHandler1.findMatch("///users"), "/users");
-  assertEquals(pathHandler1.findMatch("////users/Alice"), "/users/:userId");
+  const pathHandler = new RoutePathHandler();
+  pathHandler.addRoutePath("/");
+  pathHandler.addRoutePath("/users");
+  pathHandler.addRoutePath("/users/:userId");
+  pathHandler.addRoutePath("/users/:userId/friends");
+  pathHandler.addRoutePath("/users/:userId/friends/:friendId");
+  assertEquals(pathHandler.findMatch("//"), "/");
+  assertEquals(pathHandler.findMatch("///users"), "/users");
+  assertEquals(pathHandler.findMatch("////users/Alice"), "/users/:userId");
   assertEquals(
-    pathHandler1.findMatch("/////users/Alice/friends"),
+    pathHandler.findMatch("/////users/Alice/friends"),
     "/users/:userId/friends",
   );
   assertEquals(
-    pathHandler1.findMatch("//////users/Alice/friends/Bob"),
+    pathHandler.findMatch("//////users/Alice/friends/Bob"),
     "/users/:userId/friends/:friendId",
   );
 });
 
 Deno.test("handler recognizes empty paths", () => {
+  const pathHandler = new RoutePathHandler();
+  pathHandler.addRoutePath("/");
+  pathHandler.addRoutePath("/users");
+  pathHandler.addRoutePath("/users/:userId");
+  pathHandler.addRoutePath("/users/:userId/friends");
+  pathHandler.addRoutePath("/users/:userId/friends/:friendId");
   assertEquals(
-    pathHandler1.findMatch("/users//friends"),
+    pathHandler.findMatch("/users//friends"),
     "/users/:userId/friends",
   );
   assertEquals(
-    pathHandler1.findMatch("/users//friends/Bob"),
+    pathHandler.findMatch("/users//friends/Bob"),
     "/users/:userId/friends/:friendId",
   );
-  assertEquals(pathHandler1.findMatch("/users/Alice//friends"), undefined);
-  assertEquals(pathHandler1.findMatch("/users/Alice//friends/Bob"), undefined);
-  assertEquals(pathHandler1.findMatch("/users/Alice//Bob"), undefined);
-  assertEquals(pathHandler1.findMatch("/users/friends//Bob"), undefined);
+  assertEquals(pathHandler.findMatch("/users/Alice//friends"), undefined);
+  assertEquals(pathHandler.findMatch("/users/Alice//friends/Bob"), undefined);
+  assertEquals(pathHandler.findMatch("/users/Alice//Bob"), undefined);
+  assertEquals(pathHandler.findMatch("/users/friends//Bob"), undefined);
 });
 
 Deno.test("handler handles mix of / caveats", () => {
-  assertEquals(pathHandler1.findMatch("//users/"), "/users");
-  assertEquals(pathHandler1.findMatch("/users//"), "/users/:userId");
-  assertEquals(pathHandler1.findMatch("//users//"), "/users/:userId");
+  const pathHandler = new RoutePathHandler();
+  pathHandler.addRoutePath("/");
+  pathHandler.addRoutePath("/users");
+  pathHandler.addRoutePath("/users/:userId");
+  pathHandler.addRoutePath("/users/:userId/friends");
+  pathHandler.addRoutePath("/users/:userId/friends/:friendId");
+  assertEquals(pathHandler.findMatch("//users/"), "/users");
+  assertEquals(pathHandler.findMatch("/users//"), "/users/:userId");
+  assertEquals(pathHandler.findMatch("//users//"), "/users/:userId");
   assertEquals(
-    pathHandler1.findMatch("//users//friends/"),
+    pathHandler.findMatch("//users//friends/"),
     "/users/:userId/friends",
   );
   assertEquals(
-    pathHandler1.findMatch("/users//friends//"),
+    pathHandler.findMatch("/users//friends//"),
     "/users/:userId/friends/:friendId",
   );
   assertEquals(
-    pathHandler1.findMatch("//users//friends//"),
+    pathHandler.findMatch("//users//friends//"),
     "/users/:userId/friends/:friendId",
   );
-  assertEquals(pathHandler1.findMatch("/users///"), undefined);
-  assertEquals(pathHandler1.findMatch("//users///"), undefined);
-  assertEquals(pathHandler1.findMatch("/users//friends///"), undefined);
-  assertEquals(pathHandler1.findMatch("//users//friends///"), undefined);
+  assertEquals(pathHandler.findMatch("/users///"), undefined);
+  assertEquals(pathHandler.findMatch("//users///"), undefined);
+  assertEquals(pathHandler.findMatch("/users//friends///"), undefined);
+  assertEquals(pathHandler.findMatch("//users//friends///"), undefined);
 });
 
 /**
@@ -208,4 +255,24 @@ Deno.test("handler doesn't confuse deceiving early match", () => {
     );
     assertEquals(pathHandler.findMatch("/users/Alice"), "/users/:id");
   }
+});
+
+Deno.test("creates empty req.params", () => {
+  const { createPathParams } = RoutePathHandler;
+  assertEquals(createPathParams("/", "/"), {});
+  assertEquals(createPathParams("/users", "/users"), {});
+});
+
+Deno.test("creates req.params properly", () => {
+  const { createPathParams } = RoutePathHandler;
+  assertEquals(createPathParams("/users/:userId", "/users/Alice"), {
+    userId: "Alice",
+  });
+  assertEquals(
+    createPathParams(
+      "/users/:userId/friends/:friendId",
+      "/users/Alice/friends/Bob",
+    ),
+    { userId: "Alice", friendId: "Bob" },
+  );
 });
