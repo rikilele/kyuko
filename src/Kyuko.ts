@@ -14,18 +14,18 @@ import { RoutePathHandler } from "./RoutePathHandler.ts";
  * Runs after all middleware functions have been called.
  */
 export type KyukoRouteHandler = (
-  | ((req: KyukoRequest, res: KyukoResponse) => void)
-  | ((req: KyukoRequest, res: KyukoResponse) => Promise<void>)
-);
+  req: KyukoRequest,
+  res: KyukoResponse,
+) => Promise<unknown> | unknown;
 
 /**
  * A function that is invoked before the route handler is called.
  * Hands over execution to the next middleware / route handler on return.
  */
 export type KyukoMiddleware = (
-  | ((req: KyukoRequest, res: KyukoResponse) => void)
-  | ((req: KyukoRequest, res: KyukoResponse) => Promise<void>)
-);
+  req: KyukoRequest,
+  res: KyukoResponse,
+) => Promise<unknown> | unknown;
 
 /**
  * A function that is invoked when errors are thrown within the Kyuko app.
@@ -33,9 +33,10 @@ export type KyukoMiddleware = (
  * Hands over execution to the next error handler on return.
  */
 export type KyukoErrorHandler = (
-  | ((err: Error, req: KyukoRequest, res: KyukoResponse) => void)
-  | ((err: Error, req: KyukoRequest, res: KyukoResponse) => Promise<void>)
-);
+  err: Error,
+  req: KyukoRequest,
+  res: KyukoResponse,
+) => Promise<unknown> | unknown;
 
 /**
  * An ultra-light framework for http servers hosted on [Deno Deploy](https://deno.com/deploy).
