@@ -94,7 +94,7 @@ Where:
 - `app` is an instance of
   [`Kyuko`](https://doc.deno.land/https/deno.land/x/kyuko/mod.ts#Kyuko)
 - `METHOD` is an http request method in lowercase
-- `PATH` is a valid [route paths](#route-path)
+- `PATH` is a valid [route path](#route-paths)
 - `HANDLER` is the
   [`KyukoRouteHandler`](https://doc.deno.land/https/deno.land/x/kyuko/mod.ts#KyukoRouteHandler)
   executed when the route is matched
