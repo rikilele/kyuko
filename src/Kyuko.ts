@@ -242,6 +242,9 @@ export class Kyuko {
       req.query.append(key, value);
     });
 
+    // Fill req.path
+    req.path = RoutePathHandler.splitPathSegments(pathname).join("/");
+
     this.invokeHandlers(req, res, routeHandler);
   }
 
