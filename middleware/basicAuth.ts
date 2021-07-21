@@ -1,6 +1,6 @@
 // Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
 
-import { Status } from "../src/deps.ts";
+import { Status } from "./deps.ts";
 import { KyukoMiddleware, KyukoRequest, KyukoResponse } from "../mod.ts";
 
 /**
