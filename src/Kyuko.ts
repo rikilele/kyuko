@@ -25,6 +25,33 @@ export type KyukoRouteHandler = (
 export type KyukoMiddleware = (
   req: KyukoRequest,
   res: KyukoResponse,
+  defer: KyukoDeferFunction,
+) => Promise<unknown> | unknown;
+
+/**
+ * A function that is called by a `KyukoMiddleware` when it wants to defer some
+ * processing until after the route handler is called.
+ *
+ * ```ts
+ * // Logs the rough response time for each request
+ * app.use((req, res, defer) => {
+ *   // ... before route handling
+ *
+ *   defer((req, res) => {
+ *     // ... after route handling
+ *   });
+ * });
+ * ```
+ */
+export type KyukoDeferFunction = (deferred: KyukoDeferredHandler) => void;
+
+/**
+ * A function that is registered by a `KyukoMiddleware`, to be invoked after the
+ * route handling step is done.
+ */
+export type KyukoDeferredHandler = (
+  req: KyukoRequest,
+  res: KyukoResponse,
 ) => Promise<unknown> | unknown;
 
 /**
@@ -224,9 +251,12 @@ export class Kyuko {
     routeHandler: KyukoRouteHandler,
   ) {
     // Run middleware
+    const deferredHandlers: KyukoDeferredHandler[] = [];
     try {
       for (const middleware of this.#middleware) {
-        await middleware(req, res);
+        await middleware(req, res, (deferred) => {
+          deferredHandlers.push(deferred);
+        });
       }
     } catch (err) {
       console.error(brightRed("Error in KyukoMiddleware:"));
@@ -241,6 +271,17 @@ export class Kyuko {
       }
     } catch (err) {
       console.error(brightRed("Error in KyukoRouteHandler:"));
+      console.error(err);
+      this.handleError(err, req, res);
+    }
+
+    // Run deferred handlers
+    try {
+      for (const deferred of deferredHandlers) {
+        await deferred(req, res);
+      }
+    } catch (err) {
+      console.error(brightRed("Error in KyukoDeferredHandler:"));
       console.error(err);
       this.handleError(err, req, res);
     }
