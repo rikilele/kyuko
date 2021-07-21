@@ -28,7 +28,7 @@ jobs:
           - "v1.x"
           # - "canary"
         os:
-          - macOS-latest
+          # - macOS-latest
           # - windows-latest
           - ubuntu-latest
 
