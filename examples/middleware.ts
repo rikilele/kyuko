@@ -6,6 +6,19 @@ import { json, WithBody } from "../middleware/json.ts";
 
 const app = new Kyuko();
 
+/**
+ * Logs the rough response time for each request.
+ * For example purposes only!
+ */
+let id = 0;
+app.use((req, _res, defer) => {
+  const unique = `${id++} ${new URL(req.url).pathname}`;
+  console.time(unique);
+  defer(() => {
+    console.timeEnd(unique);
+  });
+});
+
 app.use(decodeParams());
 app.use(json());
 
