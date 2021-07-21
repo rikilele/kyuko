@@ -257,6 +257,10 @@ Deno.test("handler doesn't confuse deceiving early match", () => {
   }
 });
 
+/**
+ * Static
+ */
+
 Deno.test("creates empty req.params", () => {
   const { createPathParams } = RoutePathHandler;
   assertEquals(createPathParams("/", "/"), {});
@@ -275,4 +279,32 @@ Deno.test("creates req.params properly", () => {
     ),
     { userId: "Alice", friendId: "Bob" },
   );
+});
+
+Deno.test("splits leading slashes correctly", () => {
+  const { splitPathSegments } = RoutePathHandler;
+  assertEquals(splitPathSegments("/"), [""]);
+  assertEquals(splitPathSegments("//"), [""]);
+  assertEquals(splitPathSegments("///users"), ["", "users"]);
+  assertEquals(splitPathSegments("///users/Alice"), ["", "users", "Alice"]);
+});
+
+Deno.test("splits trailing slashes correctly", () => {
+  const { splitPathSegments } = RoutePathHandler;
+  assertEquals(splitPathSegments("/users/"), ["", "users"]);
+  assertEquals(splitPathSegments("/users/Alice/"), ["", "users", "Alice"]);
+});
+
+Deno.test("splits mid-path slashes correctly", () => {
+  const { splitPathSegments } = RoutePathHandler;
+  assertEquals(splitPathSegments("/users//"), ["", "users", ""]);
+  assertEquals(splitPathSegments("/users///"), ["", "users", "", ""]);
+  assertEquals(splitPathSegments("/users//Alice/"), ["", "users", "", "Alice"]);
+  assertEquals(splitPathSegments("/users///Alice/"), [
+    "",
+    "users",
+    "",
+    "",
+    "Alice",
+  ]);
 });

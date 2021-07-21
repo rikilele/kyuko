@@ -38,6 +38,36 @@ export class RoutePathHandler {
   }
 
   /**
+   * Splits the given path into an array of path segments.
+   * Note that `splitPathSegments(path).join('/') !== path`.
+   *
+   * Examples:
+   *   - `'/'`           => `['']`
+   *   - `'//'`          => `['']`
+   *   - `'/users'`      => `['', 'users']`
+   *   - `'//users'`     => `['', 'users']`
+   *   - `'/users/'`     => `['', 'users']`
+   *   - `'/users/:id'`  => `['', 'users', ':id']`
+   *   - `'/users//:id'` => `['', 'users', '', ':id']`
+   *
+   * @param path The route or url path to split
+   */
+  static splitPathSegments(path: string): string[] {
+    const result = path.split("/");
+    const divider = result.findIndex((seg) => seg !== "");
+    if (divider === -1) {
+      return [""];
+    }
+
+    result.splice(0, divider - 1);
+    if (result[result.length - 1] === "") {
+      result.pop();
+    }
+
+    return result;
+  }
+
+  /**
    * Adds a route path to the handler.
    * Added route paths will be considered in subsequent calls to `findMatch()`.
    *
@@ -89,36 +119,6 @@ export class RoutePathHandler {
     }
 
     return finalists[0].routePath;
-  }
-
-  /**
-   * Splits the given path into an array of path segments.
-   * Note that `splitPathSegments(path).join('/') !== path`.
-   *
-   * Examples:
-   *   - `'/'`           => `['']`
-   *   - `'//'`          => `['']`
-   *   - `'/users'`      => `['', 'users']`
-   *   - `'//users'`     => `['', 'users']`
-   *   - `'/users/'`     => `['', 'users']`
-   *   - `'/users/:id'`  => `['', 'users', ':id']`
-   *   - `'/users//:id'` => `['', 'users', '', ':id']`
-   *
-   * @param path The route or url path to split
-   */
-  private static splitPathSegments(path: string): string[] {
-    const result = path.split("/");
-    const divider = result.findIndex((seg) => seg !== "");
-    if (divider === -1) {
-      return [""];
-    }
-
-    result.splice(0, divider - 1);
-    if (result[result.length - 1] === "") {
-      result.pop();
-    }
-
-    return result;
   }
 }
 
