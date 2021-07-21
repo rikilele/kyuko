@@ -277,7 +277,8 @@ export class Kyuko {
 
     // Run deferred handlers
     try {
-      for (const deferred of deferredHandlers) {
+      while (deferredHandlers.length > 0) {
+        const deferred = deferredHandlers.pop() as KyukoDeferredHandler;
         await deferred(req, res);
       }
     } catch (err) {
