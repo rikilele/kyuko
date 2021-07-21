@@ -26,7 +26,7 @@ jobs:
       matrix:
         deno:
           - "v1.x"
-          - "canary"
+          # - "canary"
         os:
           - macOS-latest
           - windows-latest
