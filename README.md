@@ -166,6 +166,7 @@ Middleware functions can perform the following tasks:
 - Execute any code
 - Make changes to the request and response objects
 - Send a response
+- Defer logic until after route handling
 
 ### Sending Responses
 
@@ -262,9 +263,12 @@ responded to within a Kyuko app:
    as needed. All middleware will run in order of registration and until
    completion, unless an error is thrown.
 
+   Middleware also can choose to `defer()` logic until after the
+   `[ROUTE HANDLING]` step is completed.
+
    A middleware can choose to respond early to an event by calling `res.send()`,
    `res.redirect()`, etc. In that case, the `[ROUTE HANDLING]` step will not be
-   taken, and the event lifecycle ends in this step.
+   taken, and skips over to the `[DEFERRED HANDLERS]` step.
 
 1. **`[ROUTE HANDLING]` Running the route handler**
 
@@ -273,6 +277,12 @@ responded to within a Kyuko app:
 
    - A middleware chose to respond early
    - A middleware threw an error AND the error handler responded early
+
+1. **`[DEFERRED HANDLERS]` Runs deferred handlers**
+
+   Logic that is deferred in the `[MIDDLEWARE]` are run in this step. The logic
+   will be handled LIFO, and will all run until completion unless an error is
+   thrown. A deferred logic can also choose to respond (late) to the request.
 
 1. **`[ERROR HANDLING]` Handling errors**
 
