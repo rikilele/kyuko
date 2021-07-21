@@ -2,6 +2,8 @@
 
 export { Kyuko } from "./src/Kyuko.ts";
 export type {
+  KyukoDeferFunction,
+  KyukoDeferredHandler,
   KyukoErrorHandler,
   KyukoMiddleware,
   KyukoRouteHandler,
