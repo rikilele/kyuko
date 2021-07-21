@@ -70,8 +70,6 @@ export class Kyuko {
    * Registers a `handler` that is invoked when
    * GET requests are made to url paths that match the `routePath`.
    *
-   * example:
-   *
    * ```ts
    * app.get('/', (req, res) => {
    *   const { name } = req.query;
@@ -96,8 +94,6 @@ export class Kyuko {
   /**
    * Registers a `handler` that is invoked when
    * PUT requests are made to url paths that match the `routePath`.
-   *
-   * example:
    *
    * ```ts
    * app.put('/users/:id', (req, res) => {
@@ -135,8 +131,6 @@ export class Kyuko {
   /**
    * Registers a `handler` that is invoked when
    * HEAD requests are made to url paths that match the `routePath`.
-   *
-   * example:
    *
    * ```ts
    * app.head("/", (_, res) => {
