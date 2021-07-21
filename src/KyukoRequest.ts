@@ -21,6 +21,12 @@ export interface KyukoRequest extends Request {
    * Note that a single key may map to multiple different values.
    */
   query: URLSearchParams;
+
+  /**
+   * Stores the sanitized path of the request, where leading and trailing
+   * slashes are stripped off accordingly.
+   */
+  path: string;
 }
 
 /**
@@ -30,6 +36,7 @@ export interface KyukoRequest extends Request {
 export class KyukoRequestImpl extends Request implements KyukoRequest {
   params: { [key: string]: string };
   query: URLSearchParams;
+  path: string;
 
   /**
    * Instantiates a `KyukoRequest` based on the original `fetchEvent` request.
@@ -39,5 +46,6 @@ export class KyukoRequestImpl extends Request implements KyukoRequest {
     super(fetchEvent.request);
     this.params = {};
     this.query = new URLSearchParams();
+    this.path = "/";
   }
 }

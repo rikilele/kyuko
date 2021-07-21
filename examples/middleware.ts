@@ -12,7 +12,7 @@ const app = new Kyuko();
  */
 let id = 0;
 app.use((req, _res, defer) => {
-  const unique = `${id++} ${new URL(req.url).pathname}`;
+  const unique = `${id++} ${req.path}`;
   console.time(unique);
   defer(() => {
     console.timeEnd(unique);
