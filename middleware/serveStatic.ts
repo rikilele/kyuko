@@ -27,7 +27,7 @@ export function serveStatic(
   path = "/",
 ): KyukoMiddleware {
   return async function serveStatic(req: KyukoRequest, res: KyukoResponse) {
-    if (req.path.startsWith(path)) {
+    if (req.method === "GET" && req.path.startsWith(path)) {
       const fileName = req.path.split("/").at(-1) as string;
       const contentTypeHeader = contentType(fileName);
 
