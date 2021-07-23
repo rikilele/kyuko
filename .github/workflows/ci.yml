@@ -50,11 +50,11 @@ jobs:
         run: deno lint
 
       # Uncomment this step when we start using dependencies
-      - name: Cache dependencies (/src)
-        run: deno cache src/deps.ts
+      - name: Cache dependencies
+        run: deno cache deps.ts
 
-      - name: Cache dev dependencies (/test)
-        run: deno cache test/dev_deps.ts
+      - name: Cache dev dependencies
+        run: deno cache dev_deps.ts
 
       - name: Run tests
         run: deno test
