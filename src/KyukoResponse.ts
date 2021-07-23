@@ -4,7 +4,7 @@
 /// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.ns.d.ts" />
 /// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.window.d.ts" />
 
-import { Status, STATUS_TEXT } from "./deps.ts";
+import { Status, STATUS_TEXT } from "../deps.ts";
 
 /**
  * The response object that is handled in Kyuko applications.

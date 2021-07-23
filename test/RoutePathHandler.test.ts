@@ -1,6 +1,6 @@
 // Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
 
-import { assertEquals } from "./dev_deps.ts";
+import { assertEquals } from "../dev_deps.ts";
 import { RoutePathHandler } from "../src/RoutePathHandler.ts";
 
 Deno.test("empty handler", () => {

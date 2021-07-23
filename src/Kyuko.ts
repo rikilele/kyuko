@@ -4,7 +4,7 @@
 /// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.ns.d.ts" />
 /// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.window.d.ts" />
 
-import { brightRed, Status } from "./deps.ts";
+import { brightRed, Status } from "../deps.ts";
 import { KyukoRequest, KyukoRequestImpl } from "./KyukoRequest.ts";
 import { KyukoResponse, KyukoResponseImpl } from "./KyukoResponse.ts";
 import { RoutePathHandler } from "./RoutePathHandler.ts";
