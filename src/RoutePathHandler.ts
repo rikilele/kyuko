@@ -45,7 +45,12 @@ export class RoutePathHandler {
    * @returns The sanitized path.
    */
   static sanitizePath(path: string) {
-    return RoutePathHandler.splitPathSegments(path).join("/") || "/";
+    const split = RoutePathHandler.splitPathSegments(path);
+    if (split.at(-1) === "") {
+      split.push("");
+    }
+
+    return split.join("/");
   }
 
   /**
