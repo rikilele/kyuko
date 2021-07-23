@@ -4,7 +4,7 @@
 /// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.ns.d.ts" />
 /// <reference path="https://deno.land/x/deploy@0.3.0/types/deploy.window.d.ts" />
 
-import { brightRed, Status } from "./deps.ts";
+import { brightRed, Status } from "../deps.ts";
 import { KyukoRequest, KyukoRequestImpl } from "./KyukoRequest.ts";
 import { KyukoResponse, KyukoResponseImpl } from "./KyukoResponse.ts";
 import { RoutePathHandler } from "./RoutePathHandler.ts";
@@ -182,6 +182,8 @@ export class Kyuko {
     this.#customHandlers.get("POST")?.set(routePath, handler);
     this.#customHandlers.get("PUT")?.set(routePath, handler);
     this.#customHandlers.get("DELETE")?.set(routePath, handler);
+    this.#customHandlers.get("PATCH")?.set(routePath, handler);
+    this.#customHandlers.get("HEAD")?.set(routePath, handler);
   }
 
   /**
@@ -243,7 +245,7 @@ export class Kyuko {
     });
 
     // Fill req.path
-    req.path = RoutePathHandler.splitPathSegments(pathname).join("/") || "/";
+    req.path = RoutePathHandler.sanitizePath(pathname);
 
     this.invokeHandlers(req, res, routeHandler);
   }

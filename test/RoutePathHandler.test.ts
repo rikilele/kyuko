@@ -1,7 +1,7 @@
 // Copyright 2021 Riki Singh Khorana. All rights reserved. MIT license.
 
-import { assertEquals } from "./dev_deps.ts";
-import { RoutePathHandler } from "./RoutePathHandler.ts";
+import { assertEquals } from "../dev_deps.ts";
+import { RoutePathHandler } from "../src/RoutePathHandler.ts";
 
 Deno.test("empty handler", () => {
   const pathHandler = new RoutePathHandler();
@@ -281,30 +281,24 @@ Deno.test("creates req.params properly", () => {
   );
 });
 
-Deno.test("splits leading slashes correctly", () => {
-  const { splitPathSegments } = RoutePathHandler;
-  assertEquals(splitPathSegments("/"), [""]);
-  assertEquals(splitPathSegments("//"), [""]);
-  assertEquals(splitPathSegments("///users"), ["", "users"]);
-  assertEquals(splitPathSegments("///users/Alice"), ["", "users", "Alice"]);
+Deno.test("sanitizes leading slashes correctly", () => {
+  const { sanitizePath } = RoutePathHandler;
+  assertEquals(sanitizePath("/"), "/");
+  assertEquals(sanitizePath("//"), "/");
+  assertEquals(sanitizePath("///users"), "/users");
+  assertEquals(sanitizePath("///users/Alice"), "/users/Alice");
 });
 
-Deno.test("splits trailing slashes correctly", () => {
-  const { splitPathSegments } = RoutePathHandler;
-  assertEquals(splitPathSegments("/users/"), ["", "users"]);
-  assertEquals(splitPathSegments("/users/Alice/"), ["", "users", "Alice"]);
+Deno.test("sanitizes trailing slashes correctly", () => {
+  const { sanitizePath } = RoutePathHandler;
+  assertEquals(sanitizePath("/users/"), "/users");
+  assertEquals(sanitizePath("/users/Alice/"), "/users/Alice");
 });
 
-Deno.test("splits mid-path slashes correctly", () => {
-  const { splitPathSegments } = RoutePathHandler;
-  assertEquals(splitPathSegments("/users//"), ["", "users", ""]);
-  assertEquals(splitPathSegments("/users///"), ["", "users", "", ""]);
-  assertEquals(splitPathSegments("/users//Alice/"), ["", "users", "", "Alice"]);
-  assertEquals(splitPathSegments("/users///Alice/"), [
-    "",
-    "users",
-    "",
-    "",
-    "Alice",
-  ]);
+Deno.test("sanitizes mid-path slashes correctly", () => {
+  const { sanitizePath } = RoutePathHandler;
+  assertEquals(sanitizePath("/users//"), "/users//");
+  assertEquals(sanitizePath("/users///"), "/users///");
+  assertEquals(sanitizePath("/users//Alice/"), "/users//Alice");
+  assertEquals(sanitizePath("/users///Alice/"), "/users///Alice");
 });

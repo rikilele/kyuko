@@ -51,10 +51,10 @@ jobs:
 
       # Uncomment this step when we start using dependencies
       - name: Cache dependencies
-        run: deno cache src/deps.ts
+        run: deno cache deps.ts
 
       - name: Cache dev dependencies
-        run: deno cache src/dev_deps.ts
+        run: deno cache dev_deps.ts
 
       - name: Run tests
         run: deno test
