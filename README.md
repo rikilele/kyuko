@@ -286,11 +286,11 @@ responded to within a Kyuko app:
 
 1. **`[ERROR HANDLING]` Handling errors**
 
-   This step is run only if an error was thrown during the `[MIDDLEWARE]` or
-   `[ROUTE HANDLING]` steps. Error handlers registered via `app.error()` are run
-   in order of registration and until completion. They are given access to the
-   `err` thrown and the `req` and `res` objects, and are free to modify them as
-   needed.
+   This step is run only if an error was thrown during the `[MIDDLEWARE]`,
+   `[ROUTE HANDLING]`, or `[DEFERRED HANDLERS]` steps. Error handlers registered
+   via `app.error()` are run in order of registration and until completion. They
+   are given access to the `err` thrown and the `req` and `res` objects, and are
+   free to modify them as needed.
 
    Error handlers can choose to respond to the request by calling `res.send()`,
    `res.redirect()`, etc. If not, a 500 Internal Server Error is used as a
