@@ -38,6 +38,17 @@ export class RoutePathHandler {
   }
 
   /**
+   * Returns the sanitized input `path`.
+   * See "Note on handling slashes" from `RoutePathHandler` class description.
+   *
+   * @param path The path to sanitize.
+   * @returns The sanitized path.
+   */
+  static sanitizePath(path: string) {
+    return RoutePathHandler.splitPathSegments(path).join("/") || "/";
+  }
+
+  /**
    * Splits the given path into an array of path segments.
    * Note that `splitPathSegments(path).join('/') !== path`.
    *
@@ -52,7 +63,7 @@ export class RoutePathHandler {
    *
    * @param path The route or url path to split
    */
-  static splitPathSegments(path: string): string[] {
+  private static splitPathSegments(path: string): string[] {
     const result = path.split("/");
     const divider = result.findIndex((seg) => seg !== "");
     if (divider === -1) {
