@@ -182,6 +182,8 @@ export class Kyuko {
     this.#customHandlers.get("POST")?.set(routePath, handler);
     this.#customHandlers.get("PUT")?.set(routePath, handler);
     this.#customHandlers.get("DELETE")?.set(routePath, handler);
+    this.#customHandlers.get("PATCH")?.set(routePath, handler);
+    this.#customHandlers.get("HEAD")?.set(routePath, handler);
   }
 
   /**
