@@ -33,7 +33,6 @@ export type KyukoMiddleware = (
  * processing until after the route handler is called.
  *
  * ```ts
- * // Logs the rough response time for each request
  * app.use((req, res, defer) => {
  *   // ... before route handling
  *
@@ -46,8 +45,8 @@ export type KyukoMiddleware = (
 export type KyukoDeferFunction = (deferred: KyukoDeferredHandler) => void;
 
 /**
- * A function that is registered by a `KyukoMiddleware`, to be invoked after the
- * route handling step is done.
+ * A function that is registered by a `KyukoMiddleware`,
+ * to be invoked after the route handling step is done.
  */
 export type KyukoDeferredHandler = (
   req: KyukoRequest,
