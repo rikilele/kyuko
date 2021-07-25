@@ -12,9 +12,7 @@ export interface KyukoRequest extends Request {
   /**
    * Stores path parameters and their values in an object.
    */
-  params: {
-    [key: string]: string;
-  };
+  params: Record<string, string>;
 
   /**
    * Stores query parameters and their values.
@@ -34,7 +32,7 @@ export interface KyukoRequest extends Request {
  * The instance is populated by the original request handed over from the event listener.
  */
 export class KyukoRequestImpl extends Request implements KyukoRequest {
-  params: { [key: string]: string };
+  params: Record<string, string>;
   query: URLSearchParams;
   path: string;
 
