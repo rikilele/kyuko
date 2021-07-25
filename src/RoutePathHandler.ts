@@ -25,7 +25,7 @@ export class RoutePathHandler {
    * @returns e.g.) { userId: "Alice", friendId: "Bob" }
    */
   static createPathParams(routePath: string, urlPath: string) {
-    const result: { [key: string]: string } = {};
+    const result: Record<string, string> = {};
     const routeSegments = RoutePathHandler.splitPathSegments(routePath);
     const urlSegments = RoutePathHandler.splitPathSegments(urlPath);
     routeSegments.forEach((routeSegment, i) => {
