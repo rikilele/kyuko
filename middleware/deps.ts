@@ -1,2 +1,2 @@
-export { Status } from "https://deno.land/std@0.106.0/http/http_status.ts";
-export { contentType } from "https://deno.land/x/media_types@v2.10.1/mod.ts";
+export { Status } from "https://deno.land/std@0.113.0/http/http_status.ts";
+export { contentType } from "https://deno.land/x/media_types@v2.10.2/mod.ts";
